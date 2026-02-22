@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; color: #222; background: #fff; padding: 40px; }
+  .header { border-bottom: 4px solid #2E75B6; padding-bottom: 16px; margin-bottom: 24px; }
+  .header h1 { color: #1E3A5F; font-size: 24px; margin-bottom: 4px; }
+  .meta { color: #888; font-size: 12px; }
+  .summary-box {
+    background: #EBF3FB; border-left: 5px solid #2E75B6;
+    padding: 16px 20px; margin: 20px 0; border-radius: 2px;
+  }
+  .summary-box strong { color: #1E3A5F; display: block; margin-bottom: 8px; }
+  .section { margin: 28px 0; }
+  .section h2 { color: #2E75B6; font-size: 16px; margin-bottom: 12px;
+                border-bottom: 1px solid #ddd; padding-bottom: 6px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th { background: #1E3A5F; color: white; padding: 8px 10px; text-align: left; }
+  td { padding: 7px 10px; border-bottom: 1px solid #e8e8e8; }
+  tr:nth-child(even) td { background: #F5F8FB; }
+  .anomaly {
+    background: #FFF8E1; border-left: 3px solid #FFA000;
+    padding: 8px 12px; margin: 6px 0; font-size: 12px; color: #5D4037;
+  }
+  .footer {
+    margin-top: 40px; padding-top: 12px;
+    border-top: 1px solid #ddd; color: #aaa;
+    font-size: 10px; text-align: center;
+  }
+</style>
+</head>
+<body>
+  <div class="header">
+    <h1>{{ title }}</h1>
+    <div class="meta">Generated: {{ generated_at }}  |  Query: "{{ query }}"</div>
+  </div>
+
+  {% if executive_summary %}
+  <div class="summary-box">
+    <strong>Executive Summary</strong>
+    {{ executive_summary }}
+  </div>
+  {% endif %}
+
+  {% for section in sections %}
+  <div class="section">
+    <h2>{{ section.title }}</h2>
+
+    {% if section.data %}
+    <table>
+      <thead>
+        <tr>{% for col in section.columns %}<th>{{ col }}</th>{% endfor %}</tr>
+      </thead>
+      <tbody>
+        {% for row in section.data %}
+        <tr>{% for col in section.columns %}<td>{{ row.get(col, '') }}</td>{% endfor %}</tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+
+    {% if section.anomalies %}
+    {% for anomaly in section.anomalies %}
+    <div class="anomaly">{{ anomaly }}</div>
+    {% endfor %}
+    {% endif %}
+  </div>
+  {% endfor %}
+
+  <div class="footer">OLAP BI Platform  --  Confidential Report  --  {{ generated_at }}</div>
+</body>
+</html>
