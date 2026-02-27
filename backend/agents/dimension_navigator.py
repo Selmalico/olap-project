@@ -16,8 +16,8 @@ from __future__ import annotations
 from typing import Any
 
 import pandas as pd
-
-from database.repository import SalesRepository, _where as _repo_where
+from database.repository import SalesRepository
+from database.repository import _where as _repo_where
 
 # ── Hierarchy definitions ─────────────────────────────────────────────────────
 HIERARCHIES: dict[str, dict] = {
@@ -59,8 +59,6 @@ HIERARCHIES: dict[str, dict] = {
 }
 
 
-
-
 _repo = SalesRepository()
 
 
@@ -83,11 +81,15 @@ class DimensionNavigatorAgent:
         """
         h = HIERARCHIES.get(hierarchy)
         if h is None:
-            return {"error": f"Unknown hierarchy '{hierarchy}'. Choose from: {list(HIERARCHIES)}"}
+            return {
+                "error": f"Unknown hierarchy '{hierarchy}'. Choose from: {list(HIERARCHIES)}"
+            }
 
         levels = h["levels"]
         if from_level not in levels:
-            return {"error": f"'{from_level}' not in {hierarchy} hierarchy levels: {levels}"}
+            return {
+                "error": f"'{from_level}' not in {hierarchy} hierarchy levels: {levels}"
+            }
 
         from_idx = levels.index(from_level)
         if to_level is None:
@@ -125,11 +127,15 @@ class DimensionNavigatorAgent:
         """
         h = HIERARCHIES.get(hierarchy)
         if h is None:
-            return {"error": f"Unknown hierarchy '{hierarchy}'. Choose from: {list(HIERARCHIES)}"}
+            return {
+                "error": f"Unknown hierarchy '{hierarchy}'. Choose from: {list(HIERARCHIES)}"
+            }
 
         levels = h["levels"]
         if from_level not in levels:
-            return {"error": f"'{from_level}' not in {hierarchy} hierarchy levels: {levels}"}
+            return {
+                "error": f"'{from_level}' not in {hierarchy} hierarchy levels: {levels}"
+            }
 
         from_idx = levels.index(from_level)
         if to_level is None:
@@ -157,7 +163,78 @@ class DimensionNavigatorAgent:
 
     def get_hierarchy_info(self) -> dict[str, Any]:
         """Return available hierarchies and their level structures."""
+        return {name: {"levels": h["levels"]} for name, h in HIERARCHIES.items()}
+
+    def drill_through(
+        self,
+        filters: dict[str, Any] | None = None,
+        limit: int = 100,
+    ) -> dict[str, Any]:
+        """
+        Drill through to raw fact table records (detail transactions).
+
+        This operation returns the underlying individual sales transactions
+        instead of aggregated data. This allows users to see the actual
+        detailed records that make up any aggregated metric.
+
+        Parameters
+        ----------
+        filters : dict
+            Optional filters to apply (e.g. {"year": 2024, "region": "Europe"})
+        limit : int
+            Maximum number of records to return (default: 100, max: 1000)
+
+        Returns
+        -------
+        dict
+            Operation result with individual fact_sales records including
+            all dimensions and measures.
+
+        Example
+        -------
+        drill_through(filters={"year": 2024, "category": "Electronics"}, limit=50)
+        """
+        if limit > 1000:
+            limit = 1000
+
+        where_clause, params = _repo_where(filters or {})
+
+        sql = f"""
+        SELECT
+            fs.order_id,
+            dd.year,
+            dd.quarter,
+            dd.month,
+            dd.month_name,
+            dg.region,
+            dg.country,
+            dp.category,
+            dp.subcategory,
+            dc.customer_segment,
+            fs.quantity,
+            fs.unit_price,
+            fs.revenue,
+            fs.cost,
+            fs.profit,
+            fs.profit_margin
+        FROM fact_sales fs
+        JOIN dim_date      dd ON fs.date_id     = dd.date_id
+        JOIN dim_geography dg ON fs.geo_id      = dg.geo_id
+        JOIN dim_product   dp ON fs.product_id  = dp.product_id
+        JOIN dim_customer  dc ON fs.customer_id = dc.customer_id
+        {where_clause}
+        ORDER BY dd.year DESC, dd.month DESC, fs.revenue DESC
+        LIMIT ?
+        """
+
+        params.append(limit)
+        df = _repo._execute(sql, params)
+
         return {
-            name: {"levels": h["levels"]}
-            for name, h in HIERARCHIES.items()
+            "operation": "drill_through",
+            "filters": filters or {},
+            "limit": limit,
+            "columns": list(df.columns),
+            "rows": df.to_dict(orient="records"),
+            "row_count": len(df),
         }

@@ -8,12 +8,17 @@ The platform uses 7 specialized AI agents coordinated by a Planner/Orchestrator.
 
 ## Agent 1: Dimension Navigator
 
-**Purpose**: Handles drill-down and roll-up operations across dimensional hierarchies.
+**Purpose**: Handles drill-down, roll-up, and drill-through operations across dimensional hierarchies.
 
 **Hierarchies**:
 - Time: year -> quarter -> month -> week
 - Geography: region -> country
 - Product: category -> subcategory
+
+**Operations**:
+- **Drill-down**: Navigate from coarse to fine granularity (e.g., Year → Quarter → Month)
+- **Roll-up**: Navigate from fine to coarse granularity (e.g., Month → Quarter → Year)
+- **Drill-through**: Access raw fact table records (individual transactions)
 
 **Input Parameters**:
 ```json
@@ -21,7 +26,10 @@ The platform uses 7 specialized AI agents coordinated by a Planner/Orchestrator.
   "query": "string - user's natural language query",
   "params": {
     "drill_dimension": "time|geography|product",
-    "drill_level": "year|quarter|month|week|region|country|category|subcategory"
+    "drill_level": "year|quarter|month|week|region|country|category|subcategory",
+    "operation": "drill_down|roll_up|drill_through",
+    "filters": {"year": 2024},
+    "limit": 100
   }
 }
 ```
@@ -33,12 +41,16 @@ The platform uses 7 specialized AI agents coordinated by a Planner/Orchestrator.
   "data": [{"column": "value"}],
   "level": "current hierarchy level",
   "dimension": "time|geography|product",
-  "operation": "drill_down|roll_up"
+  "operation": "drill_down|roll_up|drill_through"
 }
 ```
 
-**Example Query**: "Break down 2024 revenue by quarter"
-**Expected Output**: 4 rows with quarter, revenue, profit, quantity aggregates
+**Example Queries**: 
+- "Break down 2024 revenue by quarter" (drill-down)
+- "Roll up monthly data to quarters" (roll-up)
+- "Show me the actual transactions for Electronics in Q4 2024" (drill-through)
+
+**Expected Output (drill-through)**: Individual fact_sales records with order_id, all dimensions, and measures
 
 ---
 

@@ -99,6 +99,11 @@ class ShareRequest(BaseModel):
     filters: Optional[Dict[str, Any]] = None
 
 
+class DrillThroughRequest(BaseModel):
+    filters: Optional[Dict[str, Any]] = None
+    limit: int = 100
+
+
 def _olap_response(result: dict, add_totals: bool = True) -> dict:
     """Build response dict with enrichment from anomaly, visualization, and summary agents."""
     if result.get("error"):
@@ -158,10 +163,22 @@ async def drill_down(body: DrillRequest) -> dict[str, Any]:
 
 
 @router.post("/roll-up")
-async def roll_up(body: DrillRequest) -> dict[str, Any]:
-    """Roll up to a coarser hierarchy level."""
+async def roll_up_hierarchy(body: DrillRequest) -> dict[str, Any]:
+    """Roll up in a hierarchy (coarser granularity)."""
     result = _nav.roll_up(body.hierarchy, body.from_level, body.to_level, body.filters)
     return JSONResponse(content=_olap_response(result))
+
+
+@router.post("/drill-through")
+async def drill_through_details(body: DrillThroughRequest) -> dict[str, Any]:
+    """
+    Drill through to raw fact table records (detail transactions).
+
+    Returns individual sales records instead of aggregated data.
+    Useful for investigating specific transactions that make up aggregated metrics.
+    """
+    result = _nav.drill_through(body.filters, body.limit)
+    return JSONResponse(content=_olap_response(result, add_totals=False))
 
 
 @router.get("/hierarchies")

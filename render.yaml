@@ -1,0 +1,17 @@
+# Render — Backend (Web Service)
+# https://render.com/docs/blueprint-spec
+# Deploy: connect repo and Render will use this, or create a Web Service manually with the same settings.
+
+services:
+  - type: web
+    name: olap-bi-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: .
+    plan: free
+    envVars:
+      - key: DATABASE_PATH
+        value: /app/data/olap.duckdb
+      - key: CSV_PATH
+        value: /app/data/sales_data.csv
+    healthCheckPath: /health

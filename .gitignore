@@ -12,3 +12,32 @@ data/parquet/*.parquet
 backend/reports/
 deployment.zip
 lambda_package/
+
+# Database files (should not be in version control)
+*.duckdb
+*.duckdb.wal
+*.db
+*.db-wal
+*.db-shm
+
+# Log files
+*.log
+backend_server.log
+backend_server_err.log
+frontend_server.log
+frontend_server_err.log
+backend/backend_server.log
+backend/backend.log
+backend/error.log
+
+# Generated data
+data/olap.duckdb
+data/olap.duckdb.wal
+data/sales_data.csv
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
