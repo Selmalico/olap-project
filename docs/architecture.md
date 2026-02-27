@@ -17,14 +17,14 @@
 │                         │                             │         │
 │                         v                             v         │
 │                  ┌─────────────┐            ┌─────────────────┐ │
-│                  │  DuckDB     │            │  8 AI Agents    │ │
+│                  │  DuckDB     │            │  7 AI Agents    │ │
 │                  │  Database   │            │  (Orchestrated  │ │
 │                  │  Local File │            │   by Planner)   │ │
 │                  └─────────────┘            └─────────────────┘ │
 │                                                                  │
 │                         ┌──────────────────────┐                │
-│                         │   Anthropic Claude   │                │
-│                         │   (LLM Processing)   │                │
+│                         │   Hugging Face       │                │
+│                         │   (Qwen 2.5 LLM)     │                │
 │                         └──────────────────────┘                │
 │                                                                  │
 └──────────────────────────────────────────────────────────────────┘
@@ -47,25 +47,25 @@
 
 ### Intelligence Layer
 - **Planner Agent**: Routes user queries through specialist agents
-- **8 Specialist Agents**: 
+- **7 Specialist Agents**: 
   - KPI Calculator (YoY, MoM, top-N metrics)
-  - Dimension Navigator (drill-down/roll-up)
+  - Dimension Navigator (drill-down/roll-up/drill-through)
   - Cube Operations (slice, dice, pivot)
   - Report Generator (formatted tables)
   - Anomaly Detection (Z-score analysis)
   - Executive Summary (business narratives)
   - Visualization Agent (chart recommendations)
-  - Intent Detector (query understanding)
-- **Anthropic Claude**: LLM for natural language processing
+- **Hugging Face (Qwen 2.5)**: LLM for natural language processing and function calling
+- **Intent Detector**: Part of the orchestrator for query understanding
 - **Context Manager**: Maintains conversation history
 
 ### Data Layer
 - **DuckDB**: In-process analytical database
 - **Star Schema**: 
-  - Fact table: fact_sales (10,000+ rows)
+  - Fact table: fact_sales
   - Dimensions: dim_date, dim_geography, dim_product, dim_customer
 - **Local File Storage**: olap.duckdb stored in data/ folder
-- **CSV Import**: Sales data generated from sales_data.csv
+- **CSV Import**: Sales data generated from sales_data.csv using `load_data.py`
 
 ### Processing Pipeline
 1. Natural language query from user
@@ -130,7 +130,7 @@
 | Charts | Recharts | Data visualization |
 | Backend | FastAPI + Uvicorn | REST API server |
 | Database | DuckDB | Analytical queries |
-| LLM | Anthropic Claude | Natural language processing |
+| LLM | Hugging Face / Qwen 2.5 | NLP and tool calling |
 | Validation | Pydantic | Type safety |
 
 ## Development Environment

@@ -2,273 +2,108 @@
 
 ## Overview
 
-The platform uses 7 specialized AI agents coordinated by a Planner/Orchestrator. Each agent receives the user's query, accumulated parameters, and returns structured results.
+The platform uses 7 specialized AI agents coordinated by a Planner/Orchestrator. Each agent is a Python class with specific methods that generate and execute SQL against the DuckDB data warehouse.
 
 ---
 
 ## Agent 1: Dimension Navigator
 
-**Purpose**: Handles drill-down, roll-up, and drill-through operations across dimensional hierarchies.
+**Purpose**: Handles hierarchical OLAP operations and granular data access.
 
 **Hierarchies**:
-- Time: year -> quarter -> month -> week
-- Geography: region -> country
-- Product: category -> subcategory
+- **Time**: year → quarter → month
+- **Geography**: region → country
+- **Product**: category → subcategory
 
-**Operations**:
-- **Drill-down**: Navigate from coarse to fine granularity (e.g., Year → Quarter → Month)
-- **Roll-up**: Navigate from fine to coarse granularity (e.g., Month → Quarter → Year)
-- **Drill-through**: Access raw fact table records (individual transactions)
+**Methods**:
+- `drill_down(hierarchy, from_level, to_level=None, filters=None)`: Navigates to a finer level of granularity.
+- `roll_up(hierarchy, from_level, to_level=None, filters=None)`: Navigates to a coarser level of granularity.
+- `drill_through(filters=None, limit=100)`: Accesses raw fact table records (individual transactions).
 
-**Input Parameters**:
-```json
-{
-  "query": "string - user's natural language query",
-  "params": {
-    "drill_dimension": "time|geography|product",
-    "drill_level": "year|quarter|month|week|region|country|category|subcategory",
-    "operation": "drill_down|roll_up|drill_through",
-    "filters": {"year": 2024},
-    "limit": 100
-  }
-}
-```
-
-**Output Schema**:
-```json
-{
-  "sql": "generated DuckDB SQL",
-  "data": [{"column": "value"}],
-  "level": "current hierarchy level",
-  "dimension": "time|geography|product",
-  "operation": "drill_down|roll_up|drill_through"
-}
-```
-
-**Example Queries**: 
-- "Break down 2024 revenue by quarter" (drill-down)
-- "Roll up monthly data to quarters" (roll-up)
-- "Show me the actual transactions for Electronics in Q4 2024" (drill-through)
-
-**Expected Output (drill-through)**: Individual fact_sales records with order_id, all dimensions, and measures
+**Example Result (drill_through)**: Returns individual `fact_sales` records with `order_id`, dimensions, and all measures.
 
 ---
 
 ## Agent 2: Cube Operations
 
-**Purpose**: Handles slice, dice, and pivot OLAP operations.
+**Purpose**: Handles fundamental OLAP cube manipulations: slice, dice, and pivot.
 
-**Operations**:
-- SLICE: Filter on a single dimension
-- DICE: Filter on multiple dimensions
-- PIVOT: Reorganize using conditional aggregation
-
-**Input Parameters**:
-```json
-{
-  "query": "string",
-  "params": {
-    "filters": {"year": 2024, "region": "Europe"}
-  }
-}
-```
-
-**Output Schema**:
-```json
-{
-  "sql": "generated SQL with WHERE clauses",
-  "data": [{"column": "value"}],
-  "operation": "slice|dice|pivot",
-  "filters_applied": ["year = 2024", "region = Europe"]
-}
-```
-
-**Example Query**: "Show Electronics sales in Europe for 2024"
-**Expected Output**: Filtered dataset with Electronics+Europe+2024 data
+**Methods**:
+- `slice(dimension, value, group_by=None, measures=None)`: Filters the cube on a single dimension value.
+- `dice(filters, group_by=None, measures=None)`: Filters on multiple dimensions simultaneously.
+- `pivot(rows, columns, values="revenue", filters=None, top_n=None)`: Reorganizes data into a cross-tabulation (rows × columns).
+- `get_dimension_values(dimension)`: Returns all distinct values for a given dimension.
 
 ---
 
 ## Agent 3: KPI Calculator
 
-**Purpose**: Calculates business KPIs including growth rates, rankings, and margins.
+**Purpose**: Calculates complex business KPIs and time-intelligence metrics.
 
-**Capabilities**:
-- YoY growth using LAG window functions
-- MoM change calculations
-- Profit margin computation
-- Top-N rankings
-- RANK() window functions
-
-**Input Parameters**:
-```json
-{
-  "query": "string",
-  "params": {
-    "kpi_type": "yoy|mom|margin|top_n|ranking",
-    "top_n": 5
-  }
-}
-```
-
-**Output Schema**:
-```json
-{
-  "sql": "CTE-based SQL for complex calculations",
-  "data": [{"column": "value"}],
-  "kpi_type": "yoy|mom|margin|top_n|ranking|mixed",
-  "metrics": ["revenue_growth", "profit_margin"]
-}
-```
-
-**Example Query**: "Top 5 countries by profit margin"
-**Expected Output**: 5 rows ranked by profit margin percentage
+**Methods**:
+- `aggregate(measures=None, functions=None, group_by=None, filters=None)`: Flexible aggregation (SUM, AVG, COUNT).
+- `yoy_growth(measure="revenue", group_by=None, filters=None)`: Year-over-Year growth analysis.
+- `mom_change(measure="revenue", year=None, filters=None)`: Month-over-Month trend analysis.
+- `top_n(measure="revenue", n=5, group_by="country", filters=None, ascending=False)`: Ranking analysis.
+- `profit_margins(group_by="category", filters=None, sort_desc=True)`: Margin analysis by dimension.
+- `revenue_share(group_by="region", filters=None)`: Percentage share of total.
+- `ytd_revenue(year=2024, measure="revenue", group_by=None)`: Year-to-date cumulative metrics.
+- `rolling_avg(measure="revenue", window=3, filters=None)`: Rolling moving averages.
+- `compare_periods(period_a, period_b, measure="revenue", group_by=None)`: Arbitrary period comparison.
 
 ---
 
 ## Agent 4: Report Generator
 
-**Purpose**: Formats raw OLAP results into structured report objects.
+**Purpose**: Formats raw data into structured report objects for the UI.
 
-**Input Parameters**:
-```json
-{
-  "query": "string",
-  "params": {
-    "data": [{"column": "value"}]
-  }
-}
-```
-
-**Output Schema**:
-```json
-{
-  "formatted": {
-    "title": "Report title",
-    "summary": "Plain English summary",
-    "columns": [{"name": "col", "type": "number|string|percent|currency"}],
-    "totals_row": {"column": "total"},
-    "highlights": ["Key insight with number"]
-  },
-  "data": [{"column": "value"}]
-}
-```
-
-**Example**: Given revenue-by-region data, produces a titled report with currency-formatted columns and highlight insights.
+**Methods**:
+- `generate_table(result, add_totals=True)`: Creates a titled report with typed columns and totals.
+- `executive_summary(result)`: Generates a structured summary with highlights and recommendations.
+- `dashboard_cards()`: Generates aggregated KPI cards for the main dashboard.
 
 ---
 
 ## Agent 5: Visualization Agent
 
-**Purpose**: Recommends optimal chart type and returns Recharts-compatible configuration.
+**Purpose**: Recommends optimal chart types and Recharts configurations based on data structure.
 
-**Chart Selection Rules**:
-- Time series -> LineChart
-- Category comparisons -> BarChart
-- Part-of-whole -> PieChart
-- Multiple metrics -> ComposedChart
+**Chart Selection Logic**:
+- Time series (year/month/quarter) → `LineChart`
+- Category comparisons → `BarChart`
+- Part-of-whole (share/margin) → `PieChart`
+- Multiple metrics → `ComposedChart`
 
-**Input Parameters**:
-```json
-{
-  "query": "string",
-  "params": {
-    "data": [{"column": "value"}]
-  }
-}
-```
-
-**Output Schema**:
-```json
-{
-  "chart_config": {
-    "chart_type": "LineChart|BarChart|PieChart|ComposedChart",
-    "x_axis": "field_name",
-    "y_axes": [
-      {"field": "revenue", "color": "#2E75B6", "type": "bar", "label": "Revenue"}
-    ],
-    "title": "Chart title",
-    "show_legend": true,
-    "show_grid": true,
-    "layout": "vertical|horizontal"
-  }
-}
-```
-
-**Color Palette**: `["#2E75B6", "#00B0F0", "#1F7A4D", "#C55A11", "#5B2D8E", "#C00000"]`
+**Output**: Returns a `chart_config` object containing `chart_type`, axis mappings, and color palettes.
 
 ---
 
 ## Agent 6: Anomaly Detection
 
-**Purpose**: Detects statistical outliers using Z-score analysis (no LLM calls).
+**Purpose**: Detects statistical outliers in results using Z-score analysis.
 
-**Method**: Z-score > 2.5 threshold on all numeric columns.
+**Method**: Identifies values with a Z-score > 2.5 across numeric columns (revenue, profit, etc.).
 
-**Input Parameters**:
-```json
-{
-  "query": "string",
-  "params": {
-    "data": [{"column": "value"}]
-  }
-}
-```
-
-**Output Schema**:
-```json
-{
-  "anomalies": ["revenue for LatAm: 50,000.00 is 340.5% from mean (11,340.00)"],
-  "flagged_rows": [5],
-  "columns_analyzed": ["revenue", "profit", "quantity"]
-}
-```
-
-**Note**: Caps output at 5 most notable anomalies. Requires minimum 4 data rows.
+**Note**: This agent performs local statistical analysis on the data returned by other agents; it does not generate SQL.
 
 ---
 
 ## Agent 7: Executive Summary
 
-**Purpose**: Generates a 3-sentence C-suite narrative from analysis results.
+**Purpose**: Generates a natural language narrative (3-sentence summary) from analysis results.
 
-**Structure**:
-1. What happened (key metric + direction + magnitude)
-2. What drove it (top dimension/region/product responsible)
-3. What to watch or do next (actionable recommendation)
-
-**Input Parameters**:
-```json
-{
-  "query": "string",
-  "params": {
-    "data": [{"column": "value"}],
-    "kpis": {},
-    "anomalies": []
-  }
-}
-```
-
-**Output Schema**:
-```json
-{
-  "narrative": "3-sentence executive summary with specific numbers"
-}
-```
-
-**Example Output**: "Revenue grew 12% year-over-year to $5.2M in 2024. North America led growth at 18%, driven by Electronics category expansion. Recommend increasing inventory allocation to APAC where Q4 demand outpaced supply by 23%."
+**Method**: Uses the LLM to synthesize data rows, anomalies, and KPIs into a professional business narrative.
 
 ---
 
 ## Planner / Orchestrator
 
-**Purpose**: Routes user queries to the appropriate agent sequence.
+**Purpose**: Routes user queries to the appropriate agent(s) and method(s).
 
-**Always included**: report_generator, visualization_agent, executive_summary
+**Core Logic**:
+1. **Intent Detection**: Identifies the operation (e.g., "drill down", "yoy") and extracts entities (dimensions, dates, measures).
+2. **LLM Function Calling**: Uses **Hugging Face (Qwen 2.5)** to map natural language to specific agent method calls.
+3. **Fallback Routing**: Uses a keyword-based `AgentSelector` if the LLM provider is unavailable.
+4. **Enrichment**: Automatically chains the `ReportGenerator`, `VisualizationAgent`, `AnomalyDetection`, and `ExecutiveSummary` agents to every result.
 
-**Routing logic** (determined by Claude):
-- Drill/roll-up keywords -> dimension_navigator
-- Filter keywords -> cube_operations
-- Growth/comparison keywords -> kpi_calculator
-- Unusual/pattern keywords -> anomaly_detection
-
-**Output**: Execution plan with agent sequence, parameters, and follow-up question suggestions.
+**Output**: Returns a unified response containing the original query, agent execution results, formatted reports, charts, and a narrative summary.
