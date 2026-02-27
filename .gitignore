@@ -35,6 +35,14 @@ data/olap.duckdb
 data/olap.duckdb.wal
 data/sales_data.csv
 
+# Temporary and backup files
+*.zip
+*.bak
+*.tmp
+test_backend.bat
+cleanup.bat
+cleanup_project.bat
+
 # OS files
 .DS_Store
 Thumbs.db
