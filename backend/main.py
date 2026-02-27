@@ -1,3 +1,4 @@
+import os
 import threading
 import time
 
@@ -16,9 +17,16 @@ app = FastAPI(
     description="Multi-Agent OLAP Business Intelligence Platform — 7 specialist agents",
 )
 
+# Allow the frontend origin (set FRONTEND_URL env var in production to your Vercel URL)
+_frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
+_allowed_origins = [_frontend_url]
+# Support wildcard for local dev (when FRONTEND_URL is not set)
+if _frontend_url == "http://localhost:5173":
+    _allowed_origins = ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Restrict to CloudFront domain in production
+    allow_origins=_allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -84,43 +92,6 @@ def get_schema():
             "measures": ["revenue", "profit", "cost", "quantity", "profit_margin"],
             "date_range": "2022-2024",
         }
-
-
-@app.post("/export/pdf")
-async def export_pdf(request: ExportRequest):
-    """Generate PDF report and return presigned S3 download URL."""
-    try:
-        from tools.pdf_generator import generate_pdf
-        from tools.s3_client import upload_pdf_get_url
-
-        pdf_bytes = generate_pdf(request)
-        url = upload_pdf_get_url(pdf_bytes, request.conversation_id)
-        return {"download_url": url, "expires_in": "1 hour"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.post("/email/send")
-async def send_email(request: EmailRequest):
-    """Generate PDF and email it via AWS SES."""
-    try:
-        from tools.email_sender import send_report_email
-        from tools.pdf_generator import generate_pdf
-
-        pdf_bytes = generate_pdf(request)
-        send_report_email(
-            to_email=request.to_email,
-            subject=request.subject,
-            pdf_bytes=pdf_bytes,
-            query=request.query,
-        )
-        return {"status": "sent", "to": request.to_email}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
 
 
 @app.post("/export/pdf")
