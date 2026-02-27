@@ -1,27 +1,28 @@
-import { useState, useEffect } from 'react'
-import { BarChart3, MessageSquare, Layers, TrendingUp } from 'lucide-react'
-import ChatInterface from './components/ChatInterface'
-import OLAPControls from './components/OLAPControls'
-import KPICard from './components/KPICard'
-import ResultsPanel from './components/ResultsPanel'
-import axios from 'axios'
+import { useState, useEffect } from "react";
+import { BarChart3, MessageSquare, Layers, TrendingUp } from "lucide-react";
+import ChatInterface from "./components/ChatInterface";
+import OLAPControls from "./components/OLAPControls";
+import KPICard from "./components/KPICard";
+import ResultsPanel from "./components/ResultsPanel";
+import axios from "axios";
 
 const TABS = [
-  { id: 'chat', label: 'Ask AI', icon: MessageSquare },
-  { id: 'olap', label: 'OLAP Controls', icon: Layers },
-]
+  { id: "chat", label: "Ask AI", icon: MessageSquare },
+  { id: "olap", label: "OLAP Controls", icon: Layers },
+];
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('chat')
-  const [kpiCards, setKpiCards] = useState([])
-  const [result, setResult] = useState(null)
-  const [loading, setLoading] = useState(false)
+  const [activeTab, setActiveTab] = useState("chat");
+  const [kpiCards, setKpiCards] = useState([]);
+  const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    axios.get('/api/query/dashboard')
-      .then(r => setKpiCards(r.data.cards || []))
-      .catch(() => {})
-  }, [])
+    axios
+      .get("/api/query/dashboard")
+      .then((r) => setKpiCards(r.data.cards || []))
+      .catch(() => {});
+  }, []);
 
   return (
     <div className="flex flex-col h-full">
@@ -32,8 +33,12 @@ export default function App() {
             <BarChart3 size={16} className="text-white" />
           </div>
           <div>
-            <h1 className="text-sm font-bold text-white leading-none">Selma BI</h1>
-            <p className="text-xs text-slate-500 leading-none mt-0.5">Multi-Agent Analytics Platform</p>
+            <h1 className="text-sm font-bold text-white leading-none">
+              OLAP Analytics
+            </h1>
+            <p className="text-xs text-slate-500 leading-none mt-0.5">
+              Business Intelligence Platform
+            </p>
           </div>
         </div>
 
@@ -56,32 +61,40 @@ export default function App() {
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
         <nav className="w-48 shrink-0 border-r border-white/10 p-3 flex flex-col gap-1">
-          {TABS.map(tab => {
-            const Icon = tab.icon
+          {TABS.map((tab) => {
+            const Icon = tab.icon;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors text-left ${
                   activeTab === tab.id
-                    ? 'bg-brand-600 text-white'
-                    : 'text-slate-400 hover:bg-white/5 hover:text-white'
+                    ? "bg-brand-600 text-white"
+                    : "text-slate-400 hover:bg-white/5 hover:text-white"
                 }`}
               >
                 <Icon size={15} />
                 {tab.label}
               </button>
-            )
+            );
           })}
         </nav>
 
         {/* Main content */}
         <main className="flex-1 flex overflow-hidden">
           <div className="flex-1 overflow-hidden">
-            {activeTab === 'chat' ? (
-              <ChatInterface onResult={setResult} loading={loading} setLoading={setLoading} />
+            {activeTab === "chat" ? (
+              <ChatInterface
+                onResult={setResult}
+                loading={loading}
+                setLoading={setLoading}
+              />
             ) : (
-              <OLAPControls onResult={setResult} loading={loading} setLoading={setLoading} />
+              <OLAPControls
+                onResult={setResult}
+                loading={loading}
+                setLoading={setLoading}
+              />
             )}
           </div>
 
@@ -94,5 +107,5 @@ export default function App() {
         </main>
       </div>
     </div>
-  )
+  );
 }

@@ -32,7 +32,6 @@ _viz = VisualizationAgent()
 
 # ── Pydantic models ───────────────────────────────────────────────────────────
 
-class DrillRequest(BaseModel):
 
 class DrillRequest(BaseModel):
     hierarchy: str

@@ -4,10 +4,15 @@ export default {
   theme: {
     extend: {
       colors: {
-        navy: { DEFAULT: '#1E3A5F', light: '#2E75B6' },
-        accent: '#00B0F0'
-      }
-    }
+        brand: {
+          600: "#2563eb",
+          700: "#1d4ed8",
+        },
+        slate: {
+          950: "#030712",
+        },
+      },
+    },
   },
   plugins: [],
-}
+};

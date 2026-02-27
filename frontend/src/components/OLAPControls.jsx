@@ -77,6 +77,12 @@ export default function OLAPControls({ onResult, loading, setLoading }) {
   // KPI state
   const [yoyMeasure, setYoyMeasure] = useState('revenue')
   const [yoyGroup, setYoyGroup] = useState('region')
+  const [momMeasure, setMomMeasure] = useState('revenue')
+  const [momYear, setMomYear] = useState('2024')
+  const [comparePeriodA, setComparePeriodA] = useState({ year: 2023 })
+  const [comparePeriodB, setComparePeriodB] = useState({ year: 2024 })
+  const [compareMeasure, setCompareMeasure] = useState('revenue')
+  const [compareGroup, setCompareGroup] = useState('')
   const [topMeasure, setTopMeasure] = useState('revenue')
   const [topN, setTopN] = useState('5')
   const [topGroup, setTopGroup] = useState('country')
@@ -181,6 +187,37 @@ export default function OLAPControls({ onResult, loading, setLoading }) {
           <Select label="Group By" value={yoyGroup} onChange={setYoyGroup} options={DIMENSIONS} />
         </div>
         <RunBtn onClick={() => run('/api/olap/kpi/yoy-growth', { measure: yoyMeasure, group_by: yoyGroup })} loading={loading} />
+      </Section>
+
+      {/* MoM Change */}
+      <Section title="KPI: Month-over-Month Change">
+        <div className="grid grid-cols-2 gap-3">
+          <Select label="Measure" value={momMeasure} onChange={setMomMeasure} options={MEASURES} />
+          <div>
+            <p className="label">Year (optional)</p>
+            <input className="input w-full" type="number" value={momYear} onChange={e => setMomYear(e.target.value)} placeholder="2024" min={2022} max={2024} />
+          </div>
+        </div>
+        <RunBtn onClick={() => run('/api/olap/kpi/mom-change', { measure: momMeasure, year: momYear ? Number(momYear) : null })} loading={loading} />
+      </Section>
+
+      {/* Compare Periods */}
+      <Section title="KPI: Compare Periods">
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <p className="label">Period A (e.g. year)</p>
+            <input className="input w-full" value={JSON.stringify(comparePeriodA)} onChange={e => { try { setComparePeriodA(JSON.parse(e.target.value || '{}')) } catch (_) {} }} placeholder='{"year": 2023}' />
+          </div>
+          <div>
+            <p className="label">Period B</p>
+            <input className="input w-full" value={JSON.stringify(comparePeriodB)} onChange={e => { try { setComparePeriodB(JSON.parse(e.target.value || '{}')) } catch (_) {} }} placeholder='{"year": 2024}' />
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <Select label="Measure" value={compareMeasure} onChange={setCompareMeasure} options={MEASURES} />
+          <Select label="Group By (optional)" value={compareGroup || 'none'} onChange={v => setCompareGroup(v === 'none' ? '' : v)} options={['none', ...DIMENSIONS]} />
+        </div>
+        <RunBtn onClick={() => run('/api/olap/kpi/compare', { period_a: comparePeriodA, period_b: comparePeriodB, measure: compareMeasure, group_by: compareGroup || undefined })} loading={loading} />
       </Section>
 
       {/* Top N */}

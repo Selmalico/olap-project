@@ -4,7 +4,7 @@ const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 const api = axios.create({ baseURL: API_BASE });
 
 export const queryOLAP = (query: string, history: any[], conversationId?: string) =>
-  api.post('/query', { query, history, conversation_id: conversationId }).then(r => r.data);
+  api.post('/api/query/', { query, history, conversation_id: conversationId }).then(r => r.data);
 
 export const exportPDF = (data: any) =>
   api.post('/export/pdf', data).then(r => r.data);

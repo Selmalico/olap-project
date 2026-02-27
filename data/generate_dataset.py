@@ -60,6 +60,13 @@ for i in range(10000):
     })
 
 df = pd.DataFrame(rows)
-os.makedirs("data/raw", exist_ok=True)
-df.to_csv("data/raw/global_retail_sales.csv", index=False)
-print(f"Generated {len(df)} rows -> data/raw/global_retail_sales.csv")
+script_dir = os.path.dirname(os.path.abspath(__file__))
+raw_dir = os.path.join(script_dir, "raw")
+os.makedirs(raw_dir, exist_ok=True)
+df.to_csv(os.path.join(raw_dir, "global_retail_sales.csv"), index=False)
+# Backend star-schema loader expects integer quarter and sales_data.csv
+df_sales = df.copy()
+df_sales["quarter"] = df_sales["month"].apply(lambda m: (m - 1) // 3 + 1)
+sales_path = os.path.join(script_dir, "sales_data.csv")
+df_sales.to_csv(sales_path, index=False)
+print(f"Generated {len(df)} rows -> {raw_dir}/global_retail_sales.csv, {sales_path}")

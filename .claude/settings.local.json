@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip install:*)",
+      "Bash(dir:*)",
+      "Bash(pip show:*)",
+      "Bash(node --version:*)",
+      "Bash(npm --version:*)",
+      "Bash(git ls-tree:*)",
+      "Bash(python:*)",
+      "Bash(\"C:/Users/selma_3ct5ekw/Desktop/olap/fix10_repository.py\":*)",
+      "Bash(echo:*)"
+    ]
+  }
+}

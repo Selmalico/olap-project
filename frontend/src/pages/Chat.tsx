@@ -2,15 +2,19 @@ import { useState } from 'react';
 import { useChat } from '../hooks/useChat';
 import { AgentTracker } from '../components/AgentTracker';
 import { DataTable } from '../components/DataTable';
+import { ReportChart } from '../components/ReportChart';
 import { ChartPanel } from '../components/ChartPanel';
 import { ExportToolbar } from '../components/ExportToolbar';
+import { MessageSquare, Sparkles, Loader2, AlertCircle, Lightbulb, TrendingUp, BarChart2 } from 'lucide-react';
 
 const STARTER_QUESTIONS = [
-  "Compare 2023 vs 2024 revenue by region",
-  "Show top 5 countries by profit margin",
-  "Drill down Q4 2024 by month for Electronics",
-  "What are the most profitable product categories?",
-  "Detect any unusual patterns in 2024 sales data"
+  'Compare 2023 vs 2024 revenue by region',
+  'Show top 5 countries by profit margin',
+  'Drill down Q4 2024 by month for Electronics',
+  'What are the most profitable product categories?',
+  'Show YoY growth by category',
+  'Pivot revenue by region and year',
+  'Detect any unusual patterns in 2024 sales data',
 ];
 
 export default function Chat() {
@@ -24,28 +28,44 @@ export default function Chat() {
   };
 
   return (
-    <div className="flex flex-col h-screen max-h-screen bg-gray-50">
+    <div className="flex flex-col h-screen max-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50">
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-3 bg-white border-b border-gray-200 shadow-sm">
-        <div>
-          <h1 className="text-lg font-bold text-navy">OLAP BI Assistant</h1>
-          <p className="text-xs text-gray-500">7-agent AI platform &middot; DuckDB on S3</p>
+      <header className="shrink-0 flex items-center justify-between px-6 py-4 bg-white/90 backdrop-blur border-b border-slate-200/80 shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-[#1E3A5F] to-[#2E75B6] text-white shadow-md">
+            <BarChart2 className="w-5 h-5" />
+          </div>
+          <div>
+            <h1 className="text-lg font-bold text-slate-800">OLAP BI Assistant</h1>
+            <p className="text-xs text-slate-500">Multi-agent analytics · Slice, Dice, Drill, Pivot, YoY, MoM</p>
+          </div>
         </div>
-        <button onClick={clearChat} className="text-xs text-gray-400 hover:text-gray-600">
+        <button
+          onClick={clearChat}
+          className="text-xs text-slate-500 hover:text-slate-700 px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors font-medium"
+        >
           Clear chat
         </button>
-      </div>
+      </header>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+      <main className="flex-1 overflow-y-auto px-4 sm:px-6 py-5 max-w-4xl mx-auto w-full space-y-6">
         {messages.length === 0 && (
-          <div className="text-center pt-12">
-            <p className="text-gray-500 text-sm mb-6">Start by asking a business question</p>
+          <div className="text-center pt-16 pb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-100 text-slate-400 mb-6">
+              <MessageSquare className="w-8 h-8" />
+            </div>
+            <p className="text-slate-600 font-medium mb-1">Ask a business question</p>
+            <p className="text-slate-500 text-sm mb-8 max-w-sm mx-auto">
+              Use natural language or try one of the suggested queries below.
+            </p>
             <div className="flex flex-wrap gap-2 justify-center">
-              {STARTER_QUESTIONS.map(q => (
-                <button key={q} onClick={() => sendMessage(q)}
-                  className="px-3 py-2 bg-white border border-blue-200 text-blue-700 text-xs
-                             rounded-full hover:bg-blue-50 hover:border-blue-400 transition-colors">
+              {STARTER_QUESTIONS.map((q) => (
+                <button
+                  key={q}
+                  onClick={() => sendMessage(q)}
+                  className="px-4 py-2.5 bg-white border border-slate-200 text-slate-700 text-sm rounded-xl hover:border-[#2E75B6] hover:bg-[#2E75B6]/5 hover:text-[#1E3A5F] transition-all shadow-sm"
+                >
                   {q}
                 </button>
               ))}
@@ -53,61 +73,134 @@ export default function Chat() {
           </div>
         )}
 
-        {messages.map(msg => (
-          <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-4xl w-full ${msg.role === 'user' ? 'max-w-xl' : ''}`}>
+        {messages.map((msg) => (
+          <div
+            key={msg.id}
+            className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+          >
+            <div className={`max-w-full ${msg.role === 'user' ? 'max-w-xl' : 'w-full'}`}>
               {msg.role === 'user' ? (
-                <div className="bg-navy text-white px-4 py-2.5 rounded-2xl rounded-br-sm text-sm ml-auto inline-block float-right">
-                  {msg.content}
+                <div className="bg-gradient-to-br from-[#1E3A5F] to-[#2E75B6] text-white px-4 py-3 rounded-2xl rounded-br-md shadow-md">
+                  <p className="text-sm leading-relaxed">{msg.content}</p>
                 </div>
               ) : (
-                <div className="bg-white border border-gray-200 rounded-2xl rounded-bl-sm p-4 shadow-sm">
-                  {/* Agent tracker */}
-                  {msg.agentsUsed && msg.agentsUsed.length > 0 && (
-                    <AgentTracker agents={msg.agentsUsed} loading={false} />
+                <div className="bg-white border border-slate-200/80 rounded-2xl rounded-tl-md p-5 shadow-lg shadow-slate-200/50 space-y-4">
+                  {/* Agents & actions */}
+                  {(msg.operations?.length || msg.agentsUsed?.length) && (
+                    <AgentTracker
+                      operations={msg.operations}
+                      agents={msg.agentsUsed}
+                      loading={false}
+                    />
                   )}
-                  {/* Executive summary */}
-                  <p className="text-sm text-gray-800 mt-2 leading-relaxed">{msg.content}</p>
-                  {/* Results */}
-                  {msg.results?.map((result: any, i: number) => {
-                    if (!result.data && !result.chart_config) return null;
-                    const chartResult = msg.results?.find((r: any) => r.agent_name === 'visualization_agent');
-                    return (
-                      <div key={i}>
-                        {result.data && result.data.length > 0 && i === 0 && (
-                          <>
-                            <DataTable data={result.data} />
-                            {chartResult?.chart_config && (
-                              <ChartPanel data={result.data} config={chartResult.chart_config} />
-                            )}
-                          </>
-                        )}
-                        {result.anomalies && result.anomalies.length > 0 && (
-                          <div className="mt-3 space-y-1">
-                            {result.anomalies.map((a: string, j: number) => (
-                              <div key={j} className="text-xs bg-amber-50 border-l-2 border-amber-400 px-3 py-1.5 text-amber-800">
-                                {a}
-                              </div>
-                            ))}
+
+                  {/* Summary */}
+                  <div className="space-y-2">
+                    <p className="text-sm text-slate-700 leading-relaxed">{msg.content}</p>
+                    {msg.summary?.highlights?.length > 0 && (
+                      <ul className="space-y-1 pl-4 border-l-2 border-emerald-200">
+                        {msg.summary.highlights.map((h, i) => (
+                          <li key={i} className="text-xs text-emerald-800 flex items-start gap-2">
+                            <TrendingUp className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                            {h}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    {msg.summary?.recommendations?.length > 0 && (
+                      <div className="flex flex-wrap gap-2 pt-2">
+                        {msg.summary.recommendations.map((r, i) => (
+                          <div
+                            key={i}
+                            className="inline-flex items-start gap-1.5 text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1.5"
+                          >
+                            <Lightbulb className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                            {r}
                           </div>
-                        )}
+                        ))}
                       </div>
-                    );
-                  })}
-                  {/* Export toolbar */}
-                  {msg.results && conversationId && (
-                    <ExportToolbar results={msg.results} query={msg.content}
-                      conversationId={conversationId} />
+                    )}
+                  </div>
+
+                  {/* Results: reports (tables + charts) */}
+                  {msg.reports?.length > 0 && (
+                    <div className="space-y-6 pt-2 border-t border-slate-100">
+                      {msg.reports.map((report, i) => (
+                        <section key={i} className="space-y-3">
+                          <h3 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                            <Sparkles className="w-4 h-4 text-amber-500" />
+                            {report.title}
+                          </h3>
+                          <ReportChart report={report} height={220} className="rounded-xl border border-slate-200 bg-slate-50/50 p-3" />
+                          <DataTable report={report} light />
+                        </section>
+                      ))}
+                    </div>
                   )}
-                  {/* Follow-up questions */}
-                  {msg.followUps && msg.followUps.length > 0 && (
-                    <div className="mt-3 pt-3 border-t border-gray-100">
-                      <p className="text-xs text-gray-400 mb-2">Follow-up questions:</p>
+
+                  {/* Fallback: raw result data (e.g. from orchestrator) */}
+                  {!msg.reports?.length && msg.results?.length > 0 && (
+                    <div className="space-y-4 pt-2">
+                      {msg.results.map((result: any, i: number) => {
+                        const rows = result.rows_list ?? result.rows;
+                        const cols = result.columns_list ?? result.columns;
+                        if (!rows?.length) return null;
+                        const chartResult = msg.results?.find((r: any) => r.chart_config);
+                        return (
+                          <div key={i} className="space-y-3">
+                            {result.operation && (
+                              <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+                                {result.operation.replace(/_/g, ' ')}
+                              </p>
+                            )}
+                            <DataTable columns={cols} rows={rows} totalsRow={result.totals_row} light />
+                            {chartResult?.chart_config && (
+                              <ChartPanel data={rows} config={chartResult.chart_config} />
+                            )}
+                            {result.anomalies?.length > 0 && (
+                              <div className="space-y-1.5">
+                                {result.anomalies.map((a: string, j: number) => (
+                                  <div
+                                    key={j}
+                                    className="flex items-start gap-2 text-xs bg-amber-50 border-l-2 border-amber-400 px-3 py-2 text-amber-900 rounded-r-lg"
+                                  >
+                                    <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                                    {a}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {msg.error && (
+                    <div className="flex items-start gap-2 text-sm text-rose-700 bg-rose-50 border border-rose-200 rounded-xl px-4 py-3">
+                      <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+                      {msg.content}
+                    </div>
+                  )}
+
+                  {msg.results?.length > 0 && conversationId && (
+                    <ExportToolbar
+                      results={msg.results}
+                      query={msg.content}
+                      conversationId={conversationId}
+                    />
+                  )}
+
+                  {msg.followUps?.length > 0 && (
+                    <div className="pt-3 border-t border-slate-100">
+                      <p className="text-xs text-slate-500 font-medium mb-2">Suggested follow-ups</p>
                       <div className="flex flex-wrap gap-2">
-                        {msg.followUps.map((q: string, i: number) => (
-                          <button key={i} onClick={() => sendMessage(q)}
-                            className="text-xs px-2.5 py-1 bg-blue-50 text-blue-600
-                                       border border-blue-200 rounded-full hover:bg-blue-100">
+                        {msg.followUps.map((q, i) => (
+                          <button
+                            key={i}
+                            onClick={() => sendMessage(q)}
+                            className="text-xs px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg hover:bg-[#2E75B6]/10 hover:text-[#1E3A5F] transition-colors"
+                          >
                             {q}
                           </button>
                         ))}
@@ -122,30 +215,36 @@ export default function Chat() {
 
         {loading && (
           <div className="flex justify-start">
-            <div className="bg-white border border-gray-200 rounded-2xl rounded-bl-sm p-4 shadow-sm max-w-xl">
-              <AgentTracker agents={[]} loading={true} />
+            <div className="bg-white border border-slate-200 rounded-2xl rounded-tl-md p-4 shadow-lg max-w-md w-full">
+              <AgentTracker loading operations={[]} />
+              <div className="flex items-center gap-2 mt-3 text-slate-500 text-sm">
+                <Loader2 className="w-4 h-4 animate-spin shrink-0" />
+                <span>Running OLAP pipeline…</span>
+              </div>
             </div>
           </div>
         )}
-      </div>
+      </main>
 
-      {/* Input bar */}
-      <div className="px-6 py-4 bg-white border-t border-gray-200">
+      {/* Input */}
+      <div className="shrink-0 px-4 sm:px-6 py-4 bg-white/80 backdrop-blur border-t border-slate-200/80">
         <div className="flex gap-3 max-w-4xl mx-auto">
           <input
-            type="text" value={input} onChange={e => setInput(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleSubmit()}
-            placeholder="Ask a business question... e.g. 'Compare Q3 vs Q4 2024 by region'"
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSubmit()}
+            placeholder="Ask a business question… e.g. Compare Q3 vs Q4 2024 by region"
             disabled={loading}
-            className="flex-1 border border-gray-300 rounded-xl px-4 py-2.5 text-sm
-                       focus:outline-none focus:ring-2 focus:ring-blue-400
-                       disabled:bg-gray-100 disabled:cursor-not-allowed"
+            className="flex-1 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#2E75B6]/40 focus:border-[#2E75B6] disabled:bg-slate-50 disabled:cursor-not-allowed shadow-inner"
           />
-          <button onClick={handleSubmit} disabled={loading || !input.trim()}
-            className="px-5 py-2.5 bg-navy text-white font-medium text-sm rounded-xl
-                       hover:bg-navy-light disabled:opacity-50 disabled:cursor-not-allowed
-                       transition-colors">
-            {loading ? '...' : 'Analyze'}
+          <button
+            onClick={handleSubmit}
+            disabled={loading || !input.trim()}
+            className="px-5 py-3 bg-gradient-to-r from-[#1E3A5F] to-[#2E75B6] text-white font-semibold text-sm rounded-xl shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
+          >
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+            {loading ? 'Analyzing…' : 'Analyze'}
           </button>
         </div>
       </div>

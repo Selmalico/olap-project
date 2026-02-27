@@ -6,8 +6,13 @@ export interface Message {
   role: 'user' | 'assistant';
   content: string;
   results?: any[];
+  reports?: any[];
+  summary?: { text?: string; highlights?: string[]; recommendations?: string[] };
+  operations?: string[];
   agentsUsed?: string[];
   followUps?: string[];
+  llmUsed?: boolean;
+  error?: string;
   timestamp: Date;
 }
 
@@ -33,26 +38,47 @@ export function useChat() {
     try {
       const response = await queryOLAP(query, history, conversationId);
       setConversationId(response.conversation_id);
-      setActiveAgents(response.agents_used || []);
+      const operations = (response.results || [])
+        .map((r: any) => r.operation)
+        .filter(Boolean);
+      setActiveAgents(response.agents_used || operations);
       setLastResults(response);
 
+      const summary = response.summary || {};
       const assistantMsg: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: response.executive_summary || 'Analysis complete. See results below.',
+        content: summary.text || 'Analysis complete. See results below.',
         results: response.results,
-        agentsUsed: response.agents_used,
-        followUps: response.follow_up_questions,
-        timestamp: new Date()
+        reports: response.reports,
+        summary: {
+          text: summary.text,
+          highlights: summary.highlights || [],
+          recommendations: summary.recommendations || [],
+        },
+        operations,
+        agentsUsed: response.agents_used || operations,
+        followUps: response.follow_up_questions || [],
+        llmUsed: response.llm_used,
+        timestamp: new Date(),
       };
       setMessages(prev => [...prev, assistantMsg]);
     } catch (e: any) {
-      setMessages(prev => [...prev, {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: `Error: ${e.response?.data?.detail || e.message || 'Something went wrong'}`,
-        timestamp: new Date()
-      }]);
+      const detail = e.response?.data?.detail;
+      const errMsg =
+        typeof detail === 'string'
+          ? detail
+          : detail?.message || detail?.error || e.message || 'Something went wrong';
+      setMessages(prev => [
+        ...prev,
+        {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: `Error: ${errMsg}`,
+          error: errMsg,
+          timestamp: new Date(),
+        },
+      ]);
     } finally {
       setLoading(false);
     }

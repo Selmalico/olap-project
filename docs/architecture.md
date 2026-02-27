@@ -1,103 +1,196 @@
-# OLAP BI Platform - Architecture
+# OLAP Analytics Platform - Architecture
 
 ## System Overview
 
 ```
-+------------------+       +-------------------+       +------------------+
-|                  |       |                   |       |                  |
-|  React Frontend  +------>+  API Gateway      +------>+  AWS Lambda      |
-|  (CloudFront)    |       |  (HTTP API)       |       |  (FastAPI)       |
-|                  |       |                   |       |                  |
-+------------------+       +-------------------+       +--------+---------+
-                                                                |
-                                                    +-----------+-----------+
-                                                    |                       |
-                                                    v                       v
-                                            +-------+-------+      +-------+-------+
-                                            |   Planner /   |      |   DuckDB      |
-                                            |  Orchestrator |      |   Executor    |
-                                            +-------+-------+      +-------+-------+
-                                                    |                       |
-                                    +---------------+---------------+       |
-                                    |       |       |       |       |       |
-                                    v       v       v       v       v       v
-                                +-----+ +-----+ +-----+ +-----+ +-----+ +--------+
-                                |Dim  | |Cube | |KPI  | |Viz  | |Exec | |S3      |
-                                |Nav  | |Ops  | |Calc | |Agent| |Summ | |Parquet |
-                                +-----+ +-----+ +-----+ +-----+ +-----+ +--------+
-                                    |       |       |
-                                    v       v       v
-                                +-----+ +-----+ +-----+
-                                |Rpt  | |Anom | |PDF  |
-                                |Gen  | |Det  | |Gen  |
-                                +-----+ +-----+ +--+--+
-                                                    |
-                                            +-------+-------+
-                                            |       |       |
-                                            v       v       v
-                                        +-----+ +-----+ +-----+
-                                        | S3  | | SES | | PDF |
-                                        |Rpts | |Email| |D/L  |
-                                        +-----+ +-----+ +-----+
+┌──────────────────────────────────────────────────────────────────┐
+│                                                                  │
+│                      Local Development Setup                     │
+│                                                                  │
+│  ┌──────────────────┐         ┌──────────────────┐              │
+│  │  React Frontend  │         │  FastAPI Backend │              │
+│  │  (Vite)          │◄───────►│  (Uvicorn)       │              │
+│  │  Port 5173       │         │  Port 8000       │              │
+│  └──────────────────┘         └────────┬─────────┘              │
+│                                        │                        │
+│                         ┌──────────────┴──────────────┐         │
+│                         │                             │         │
+│                         v                             v         │
+│                  ┌─────────────┐            ┌─────────────────┐ │
+│                  │  DuckDB     │            │  8 AI Agents    │ │
+│                  │  Database   │            │  (Orchestrated  │ │
+│                  │  Local File │            │   by Planner)   │ │
+│                  └─────────────┘            └─────────────────┘ │
+│                                                                  │
+│                         ┌──────────────────────┐                │
+│                         │   Anthropic Claude   │                │
+│                         │   (LLM Processing)   │                │
+│                         └──────────────────────┘                │
+│                                                                  │
+└──────────────────────────────────────────────────────────────────┘
 ```
 
 ## Component Descriptions
 
 ### Frontend Layer
-- **React + TypeScript + Vite**: Single-page application with chat-based UI
-- **TailwindCSS**: Utility-first styling with custom navy/accent theme
+- **React 18 + TypeScript + Vite**: Single-page application with chat-based UI
+- **Tailwind CSS**: Utility-first styling with dark theme
 - **Recharts**: Data visualization (Line, Bar, Pie, Composed charts)
-- **CloudFront**: CDN distribution for static assets from S3
+- **Lucide React**: Icon library
+- **Axios**: HTTP client for API calls
 
 ### API Layer
-- **API Gateway**: HTTP API routing requests to Lambda
-- **AWS Lambda**: Serverless compute running FastAPI via Mangum adapter
-- **FastAPI**: REST API with 5 endpoints (/health, /schema, /query, /export/pdf, /email/send)
+- **FastAPI**: REST API with typed endpoints
+- **Uvicorn**: ASGI server (runs on port 8000)
+- **Pydantic**: Request/response validation
+- **CORS Middleware**: Cross-origin support for frontend
 
 ### Intelligence Layer
-- **Planner/Orchestrator**: Routes user queries to appropriate agents using Claude
-- **7 AI Agents**: Specialized Claude-powered agents for different OLAP operations
-- **Context Manager**: Maintains conversation history (in-memory, last 20 turns)
+- **Planner Agent**: Routes user queries through specialist agents
+- **8 Specialist Agents**: 
+  - KPI Calculator (YoY, MoM, top-N metrics)
+  - Dimension Navigator (drill-down/roll-up)
+  - Cube Operations (slice, dice, pivot)
+  - Report Generator (formatted tables)
+  - Anomaly Detection (Z-score analysis)
+  - Executive Summary (business narratives)
+  - Visualization Agent (chart recommendations)
+  - Intent Detector (query understanding)
+- **Anthropic Claude**: LLM for natural language processing
+- **Context Manager**: Maintains conversation history
 
 ### Data Layer
-- **DuckDB**: In-process analytical database reading Parquet directly from S3
-- **S3 Data Bucket**: Stores Parquet files (fact_sales.parquet)
-- **S3 Reports Bucket**: Stores generated PDF reports
-- **Star Schema**: Fact table with 4 dimension tables (date, geography, product, customer)
+- **DuckDB**: In-process analytical database
+- **Star Schema**: 
+  - Fact table: fact_sales (10,000+ rows)
+  - Dimensions: dim_date, dim_geography, dim_product, dim_customer
+- **Local File Storage**: olap.duckdb stored in data/ folder
+- **CSV Import**: Sales data generated from sales_data.csv
 
-### Export Layer
-- **WeasyPrint**: HTML-to-PDF conversion using Jinja2 templates
-- **AWS SES**: Email delivery with PDF attachments
-- **S3 Presigned URLs**: Temporary download links for PDF reports
+### Processing Pipeline
+1. Natural language query from user
+2. Intent detection and routing
+3. Agent orchestration (Planner selects agents)
+4. DuckDB SQL execution
+5. Results aggregation
+6. Enrichment (anomalies, summaries, charts)
+7. Response formatting
 
 ## Data Flow
 
-1. User types a business question in the chat UI
-2. React sends POST to `/query` with the question and conversation history
-3. FastAPI receives request, passes to Planner/Orchestrator
-4. Planner calls Claude to determine which agents to invoke
-5. Agents execute in sequence, each receiving accumulated data from prior agents
-6. SQL-generating agents produce DuckDB queries that read Parquet from S3
-7. Results flow through Report Generator, Visualization Agent, and Executive Summary
-8. Response returns to frontend with data, chart config, anomalies, and narrative
-9. React renders table, chart, agent tracker badges, and follow-up suggestions
+1. User types business question in chat interface
+2. React sends POST to `/api/query/` with question and conversation history
+3. FastAPI receives request, passes to Intent Detector
+4. Planner orchestrates appropriate agents
+5. Agents generate and execute DuckDB SQL queries
+6. Results enriched with:
+   - Anomalies (AnomalyDetectionAgent)
+   - Executive summary (ExecutiveSummaryAgent)
+   - Chart recommendations (VisualizationAgent)
+7. Response returns to frontend with:
+   - Data rows
+   - Anomalies detected
+   - Narrative summary
+   - Chart configuration
+8. React renders results with chart and table
 
-## Technology Decisions
+## API Endpoints
 
-| Decision | Choice | Rationale |
-|----------|--------|-----------|
-| Database | DuckDB | Zero-config OLAP engine, reads Parquet directly from S3 |
-| AI Model | Claude | Strong JSON output, instruction following for SQL generation |
-| Backend | FastAPI | Async support, auto-generated OpenAPI docs, Pydantic validation |
-| Frontend | React+Vite | Fast dev experience, TypeScript safety, rich ecosystem |
-| Deployment | Lambda | Serverless, auto-scaling, pay-per-request |
-| PDF | WeasyPrint | CSS-styled HTML to PDF, no external service needed |
-| Charts | Recharts | React-native, composable, good defaults |
+### Natural Language Queries
+- `POST /api/query/` - Submit natural language query
+- `GET /api/query/dashboard` - Get KPI cards
+- `GET /api/query/suggestions` - Example queries
 
-## Scalability Notes
+### OLAP Operations
+- `POST /api/olap/drill-down` - Hierarchy drill-down
+- `POST /api/olap/roll-up` - Aggregate hierarchy
+- `POST /api/olap/slice` - Single dimension filter
+- `POST /api/olap/dice` - Multiple dimension filter
+- `POST /api/olap/pivot` - Cross-tabulation
 
-- **DuckDB + S3**: Scales to billions of rows; Parquet columnar format enables fast aggregations
-- **Lambda**: Auto-scales to 1000 concurrent executions by default
-- **CloudFront**: Global edge caching for frontend assets
+### KPI Calculations
+- `POST /api/olap/kpi/yoy-growth` - Year-over-year
+- `POST /api/olap/kpi/mom-change` - Month-over-month
+- `POST /api/olap/kpi/margins` - Profit analysis
+- `POST /api/olap/kpi/top-n` - Rankings
+- `POST /api/olap/kpi/compare` - Period comparison
+- `POST /api/olap/kpi/revenue-share` - Share analysis
+
+### Utilities
+- `GET /health` - Health check
+- `GET /docs` - API documentation
+- `GET /schema` - Database schema info
+
+## Technology Stack
+
+| Layer | Technology | Purpose |
+|-------|-----------|---------|
+| Frontend | React 18 + Vite | Modern web UI |
+| Styling | Tailwind CSS | Responsive design |
+| Charts | Recharts | Data visualization |
+| Backend | FastAPI + Uvicorn | REST API server |
+| Database | DuckDB | Analytical queries |
+| LLM | Anthropic Claude | Natural language processing |
+| Validation | Pydantic | Type safety |
+
+## Development Environment
+
+- **Language**: Python 3.11 (backend), JavaScript/TypeScript (frontend)
+- **Package Manager**: pip (Python), npm (JavaScript)
+- **Dev Server**: Uvicorn (backend), Vite (frontend)
+- **Database**: DuckDB (local file: data/olap.duckdb)
+
+## Key Features
+
+✅ **Multi-Agent Architecture**: 8 specialized agents for different operations
+✅ **Natural Language Interface**: Chat-based query interface
+✅ **OLAP Operations**: Drill, slice, dice, pivot transformations
+✅ **Intelligent Enrichment**: Auto-detect anomalies, generate summaries, recommend charts
+✅ **Dark Theme UI**: Professional, accessible interface
+✅ **Local First**: Works entirely on local machine without cloud dependencies
+✅ **Conversation Context**: Maintains history for follow-up queries
+
+## Database Schema
+
+### fact_sales (Main Fact Table)
+- sale_id (PK)
+- order_id
+- date_id (FK)
+- geo_id (FK)
+- product_id (FK)
+- customer_id (FK)
+- quantity
+- unit_price
+- revenue
+- cost
+- profit
+- profit_margin
+
+### Dimensions
+- **dim_date**: Date, year, quarter, month
+- **dim_geography**: Region, country
+- **dim_product**: Category, subcategory
+- **dim_customer**: Customer segment
+
+## Running the Application
+
+### Backend
+```bash
+cd backend
+python main.py
+# Runs on http://localhost:8000
+```
+
+### Frontend
+```bash
+cd frontend
+npm run dev
+# Runs on http://localhost:5173
+```
+
+### API Documentation
+```
+http://localhost:8000/docs
+```- **CloudFront**: Global edge caching for frontend assets
 - **Context Manager**: Currently in-memory; swap to Redis/DynamoDB for multi-instance deployment
 - **Agent Pipeline**: Sequential execution; could be parallelized for independent agents
