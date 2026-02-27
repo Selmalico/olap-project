@@ -13,55 +13,9 @@ from typing import Any
 
 import pandas as pd
 
-from database.connection import get_db
+from database.repository import SalesRepository, VALID_DIMENSIONS, VALID_MEASURES, _where as _repo_where
 
-BASE_JOIN = """
-FROM fact_sales fs
-JOIN dim_date      dd ON fs.date_id     = dd.date_id
-JOIN dim_geography dg ON fs.geo_id      = dg.geo_id
-JOIN dim_product   dp ON fs.product_id  = dp.product_id
-JOIN dim_customer  dc ON fs.customer_id = dc.customer_id
-"""
-
-VALID_DIMENSIONS = {
-    "year": "dd.year",
-    "quarter": "dd.quarter",
-    "month": "dd.month",
-    "month_name": "dd.month_name",
-    "region": "dg.region",
-    "country": "dg.country",
-    "category": "dp.category",
-    "subcategory": "dp.subcategory",
-    "customer_segment": "dc.customer_segment",
-}
-
-VALID_MEASURES = {"revenue", "profit", "cost", "quantity", "profit_margin"}
-
-
-def _col(dim: str) -> str:
-    return VALID_DIMENSIONS.get(dim, dim)
-
-
-def _where(filters: dict[str, Any]) -> str:
-    clauses: list[str] = []
-    for k, v in filters.items():
-        col = VALID_DIMENSIONS.get(k)
-        if not col:
-            continue
-        if isinstance(v, list):
-            quoted = ", ".join(f"'{x}'" for x in v)
-            clauses.append(f"{col} IN ({quoted})")
-        elif isinstance(v, (int, float)):
-            clauses.append(f"{col} = {v}")
-        else:
-            clauses.append(f"{col} = '{v}'")
-    return ("WHERE " + " AND ".join(clauses)) if clauses else ""
-
-
-def _measure_expr(measure: str) -> str:
-    if measure == "profit_margin":
-        return "AVG(fs.profit_margin)"
-    return f"SUM(fs.{measure})"
+_repo = SalesRepository()
 
 
 class CubeOperationsAgent:
@@ -86,32 +40,7 @@ class CubeOperationsAgent:
         # Default to grouping by the slice dimension if no group_by provided
         group_by = [g for g in (group_by or [dimension]) if g in VALID_DIMENSIONS]
 
-        select_parts = []
-        if group_by:
-            select_parts.append(", ".join(_col(g) + f" AS {g}" for g in group_by))
-        
-        select_parts.append(", ".join(f"{_measure_expr(m)} AS total_{m}" for m in measures))
-        select_dims_measures = ", ".join(p for p in select_parts if p)
-        
-        group_clause = ""
-        if group_by:
-            group_clause = "GROUP BY " + ", ".join(_col(g) for g in group_by)
-            order_clause = "ORDER BY " + ", ".join(_col(g) for g in group_by)
-        else:
-            order_clause = ""
-
-        where = _where({dimension: value})
-
-        sql = f"""
-        SELECT {select_dims_measures},
-               COUNT(*) AS order_count
-        {BASE_JOIN}
-        {where}
-        {group_clause}
-        {order_clause}
-        """
-
-        df = get_db().execute(sql).df()
+        df = _repo.get_slice(dimension, value, group_by, measures)
         return {
             "operation": "slice",
             "dimension": dimension,
@@ -142,32 +71,7 @@ class CubeOperationsAgent:
         group_by = group_by or list(filters.keys())
         group_by = [g for g in group_by if g in VALID_DIMENSIONS]
 
-        select_parts = []
-        if group_by:
-            select_parts.append(", ".join(_col(g) + f" AS {g}" for g in group_by))
-        
-        select_parts.append(", ".join(f"{_measure_expr(m)} AS total_{m}" for m in measures))
-        select_dims_measures = ", ".join(p for p in select_parts if p)
-        
-        group_clause = ""
-        if group_by:
-            group_clause = "GROUP BY " + ", ".join(_col(g) for g in group_by)
-            order_clause = "ORDER BY " + ", ".join(_col(g) for g in group_by)
-        else:
-            order_clause = ""
-
-        where = _where(filters)
-
-        sql = f"""
-        SELECT {select_dims_measures},
-               COUNT(*) AS order_count
-        {BASE_JOIN}
-        {where}
-        {group_clause}
-        {order_clause}
-        """
-
-        df = get_db().execute(sql).df()
+        df = _repo.get_dice(filters, group_by, measures)
         return {
             "operation": "dice",
             "filters": filters,
@@ -197,20 +101,7 @@ class CubeOperationsAgent:
         if values not in VALID_MEASURES:
             return {"error": f"Unknown measure '{values}'. Valid: {list(VALID_MEASURES)}"}
 
-        where = _where(filters or {})
-        measure_expr = _measure_expr(values)
-
-        sql = f"""
-        SELECT {_col(rows)} AS row_dim,
-               {_col(columns)} AS col_dim,
-               {measure_expr} AS val
-        {BASE_JOIN}
-        {where}
-        GROUP BY {_col(rows)}, {_col(columns)}
-        ORDER BY {_col(rows)}, {_col(columns)}
-        """
-
-        df = get_db().execute(sql).df()
+        df = _repo.get_pivot_data(rows, columns, values, filters or {})
         pivoted = df.pivot_table(index="row_dim", columns="col_dim", values="val", aggfunc="sum")
         pivoted = pivoted.reset_index()
         pivoted.columns.name = None
@@ -237,11 +128,5 @@ class CubeOperationsAgent:
         if dimension not in VALID_DIMENSIONS:
             return {"error": f"Unknown dimension '{dimension}'."}
 
-        col = _col(dimension)
-        sql = f"""
-        SELECT DISTINCT {col} AS value
-        {BASE_JOIN}
-        ORDER BY {col}
-        """
-        rows = get_db().execute(sql).fetchall()
-        return {"dimension": dimension, "values": [r[0] for r in rows]}
+        values = _repo.get_dimension_values(dimension)
+        return {"dimension": dimension, "values": values}

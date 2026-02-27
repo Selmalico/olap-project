@@ -1,0 +1,4 @@
+# Procfile for AWS Elastic Beanstalk
+# Tells Beanstalk how to run the FastAPI application
+
+web: uvicorn main:app --host 0.0.0.0 --port 8000

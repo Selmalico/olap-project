@@ -1,0 +1,72 @@
+INFO:     Will watch for changes in these directories: ['C:\\Users\\selma_3ct5ekw\\Desktop\\olap\\olap-project\\backend']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [42576] using WatchFiles
+INFO:     Started server process [41872]
+INFO:     Waiting for application startup.
+ERROR:    Traceback (most recent call last):
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 694, in lifespan
+    async with self.lifespan_context(app) as maybe_state:
+               ~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\contextlib.py", line 214, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 201, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ~~~~~~~~~~~~~~~~^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\contextlib.py", line 214, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 201, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ~~~~~~~~~~~~~~~~^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\contextlib.py", line 214, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\main.py", line 46, in lifespan
+    init_db()
+    ~~~~~~~^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\database\connection.py", line 164, in init_db
+    print(f"\u2713 Database ready: {row_count:,} fact rows")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2713' in position 0: character maps to <undefined>
+
+ERROR:    Application startup failed. Exiting.WWARNING:  WatchFiles detected changes in 'database\connection.py'. Reloading... IINFO:     Started server process [31472]
+INFO:     Waiting for application startup.ERROR:    Traceback (most recent call last):
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 694, in lifespan
+    async with self.lifespan_context(app) as maybe_state:
+               ~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\contextlib.py", line 214, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 201, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ~~~~~~~~~~~~~~~~^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\contextlib.py", line 214, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 201, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ~~~~~~~~~~~~~~~~^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\contextlib.py", line 214, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\main.py", line 46, in lifespan
+    init_db()
+    ~~~~~~~^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\database\connection.py", line 152, in init_db
+    conn = get_db()
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\database\connection.py", line 35, in get_db
+    _conn = duckdb.connect(_DB_PATH, read_only=False)
+_duckdb.IOException: IO Error: Cannot open file "c:\users\selma_3ct5ekw\desktop\olap\olap-project\backend\..\data\olap.duckdb": The process cannot access the file because it is being used by another process.
+
+File is already open in 
+C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\python.exe (PID 10872)
+C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\python.exe (PID 31472)
+
+ERROR:    Application startup failed. Exiting.
+hon\Python313\python.exe (PID 37592)
+
+ERROR:    Application startup failed. Exiting.

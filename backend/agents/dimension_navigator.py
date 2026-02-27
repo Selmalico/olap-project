@@ -17,7 +17,7 @@ from typing import Any
 
 import pandas as pd
 
-from database.connection import get_db
+from database.repository import SalesRepository, _where as _repo_where
 
 # ── Hierarchy definitions ─────────────────────────────────────────────────────
 HIERARCHIES: dict[str, dict] = {
@@ -58,41 +58,10 @@ HIERARCHIES: dict[str, dict] = {
     },
 }
 
-BASE_JOIN = """
-FROM fact_sales fs
-JOIN dim_date     dd ON fs.date_id     = dd.date_id
-JOIN dim_geography dg ON fs.geo_id     = dg.geo_id
-JOIN dim_product   dp ON fs.product_id = dp.product_id
-JOIN dim_customer  dc ON fs.customer_id= dc.customer_id
-"""
 
 
-def _build_where(filters: dict[str, Any]) -> str:
-    """Convert a filter dict into a SQL WHERE clause."""
-    clauses: list[str] = []
-    mapping = {
-        "year": "dd.year",
-        "quarter": "dd.quarter",
-        "month": "dd.month",
-        "month_name": "dd.month_name",
-        "region": "dg.region",
-        "country": "dg.country",
-        "category": "dp.category",
-        "subcategory": "dp.subcategory",
-        "customer_segment": "dc.customer_segment",
-    }
-    for key, value in (filters or {}).items():
-        col = mapping.get(key)
-        if not col:
-            continue
-        if isinstance(value, list):
-            quoted = ", ".join(f"'{v}'" for v in value)
-            clauses.append(f"{col} IN ({quoted})")
-        elif isinstance(value, (int, float)):
-            clauses.append(f"{col} = {value}")
-        else:
-            clauses.append(f"{col} = '{value}'")
-    return ("WHERE " + " AND ".join(clauses)) if clauses else ""
+
+_repo = SalesRepository()
 
 
 class DimensionNavigatorAgent:
@@ -130,22 +99,8 @@ class DimensionNavigatorAgent:
 
         group_cols = h["tables"][to_level]
         label_cols = h["labels"][to_level]
-        where_clause = _build_where(filters or {})
-
-        sql = f"""
-        SELECT {group_cols},
-               SUM(fs.revenue)  AS total_revenue,
-               SUM(fs.profit)   AS total_profit,
-               SUM(fs.quantity) AS total_quantity,
-               COUNT(*)         AS order_count,
-               AVG(fs.profit_margin) AS avg_margin
-        {BASE_JOIN}
-        {where_clause}
-        GROUP BY {group_cols}
-        ORDER BY {group_cols}
-        """
-
-        df = get_db().execute(sql).df()
+        where_clause, params = _repo_where(filters or {})
+        df = _repo.get_hierarchy_data(group_cols, where_clause, group_cols, params)
         return {
             "operation": "drill_down",
             "hierarchy": hierarchy,
@@ -186,22 +141,8 @@ class DimensionNavigatorAgent:
 
         group_cols = h["tables"][to_level]
         label_cols = h["labels"][to_level]
-        where_clause = _build_where(filters or {})
-
-        sql = f"""
-        SELECT {group_cols},
-               SUM(fs.revenue)  AS total_revenue,
-               SUM(fs.profit)   AS total_profit,
-               SUM(fs.quantity) AS total_quantity,
-               COUNT(*)         AS order_count,
-               AVG(fs.profit_margin) AS avg_margin
-        {BASE_JOIN}
-        {where_clause}
-        GROUP BY {group_cols}
-        ORDER BY {group_cols}
-        """
-
-        df = get_db().execute(sql).df()
+        where_clause, params = _repo_where(filters or {})
+        df = _repo.get_hierarchy_data(group_cols, where_clause, group_cols, params)
         return {
             "operation": "roll_up",
             "hierarchy": hierarchy,

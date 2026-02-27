@@ -93,8 +93,13 @@ class ReportGeneratorAgent:
         format_money : column names to format as currency
         format_pct   : column names to format as percentage
         """
-        rows = data.get("rows", data.get("rows_list", []))
-        columns = data.get("columns", data.get("columns_list", list(rows[0].keys()) if rows else []))
+        # Pivot returns "rows"/"columns" as dimension names (str); table data is in rows_list/columns_list
+        if data.get("operation") == "pivot":
+            rows = data.get("rows_list", [])
+            columns = data.get("columns_list", [])
+        else:
+            rows = data.get("rows", data.get("rows_list", []))
+            columns = data.get("columns", data.get("columns_list", list(rows[0].keys()) if rows and isinstance(rows, list) else []))
 
         if not rows:
             return {"title": title or "Empty Report", "table": [], "columns": [], "summary": "No data found."}
@@ -172,9 +177,12 @@ class ReportGeneratorAgent:
         """
         # Heuristic fallback first
         operation = data.get("operation", "unknown")
-        rows = data.get("rows", data.get("rows_list", []))
+        if operation == "pivot":
+            rows = data.get("rows_list", [])
+        else:
+            rows = data.get("rows", data.get("rows_list", []))
 
-        if not rows:
+        if not rows or not isinstance(rows, list):
             return {"summary": "No data available for this query.", "highlights": [], "recommendations": []}
 
         df = pd.DataFrame(rows)

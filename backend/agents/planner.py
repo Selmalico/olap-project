@@ -30,11 +30,21 @@ from .cube_operations import CubeOperationsAgent
 from .dimension_navigator import DimensionNavigatorAgent
 from .kpi_calculator import KPICalculatorAgent
 from .report_generator import ReportGeneratorAgent
+from orchestrator.intent_detector import IntentDetector
+from orchestrator.agent_selector import AgentSelector
+from agents.visualization_agent import VisualizationAgent
+from agents.anomaly_detection import AnomalyDetectionAgent
+from agents.executive_summary import ExecutiveSummaryAgent
 
 _cube = CubeOperationsAgent()
 _nav = DimensionNavigatorAgent()
 _kpi = KPICalculatorAgent()
 _rpt = ReportGeneratorAgent()
+_viz = VisualizationAgent()
+_anomaly = AnomalyDetectionAgent()
+_exec_summary = ExecutiveSummaryAgent()
+_detector = IntentDetector()
+_selector = AgentSelector()
 
 # ── Tool definitions sent to LLM ──────────────────────────────────────────
 TOOLS = [
@@ -418,6 +428,58 @@ class PlannerAgent:
             results.append(result)
         return results
 
+    def _execute_step(self, step: dict, last_result: dict | None) -> dict:
+        """Execute a single AgentSelector step, returning its result."""
+        agent_key = step["agent"]
+        method_name = step["method"]
+        params = dict(step.get("params", {}))
+
+        # Resolve {BEST_<DIM>} placeholders from prior step result
+        if last_result:
+            rows = last_result.get("rows", [])
+            winner = rows[0].get("group_dim") if rows else None
+            if winner:
+                for key, val in list(params.items()):
+                    if isinstance(val, str) and val.startswith("{BEST_"):
+                        params[key] = winner
+                    elif isinstance(val, dict):
+                        for k2, v2 in list(val.items()):
+                            if isinstance(v2, str) and v2.startswith("{BEST_"):
+                                val[k2] = winner
+
+        agent_map = {"kpi": _kpi, "cube": _cube, "nav": _nav, "report": _rpt}
+        agent = agent_map.get(agent_key)
+        if agent is None:
+            return {"error": f"Unknown agent"}
+        method = getattr(agent, method_name, None)
+        if method is None:
+            return {"error": f"Agent has no method"}
+        try:
+            return method(**params)
+        except Exception as exc:
+            return {"error": str(exc)}
+
+    def _run_orchestrated(self, user_query: str, history=None) -> list[dict]:
+        """Use IntentDetector + AgentSelector to build and execute a step plan."""
+        intent_obj = _detector.detect(user_query, history)
+
+        if _selector.detect_chained_flow(user_query, intent_obj):
+            steps = _selector.build_chained_flow(intent_obj["params"])
+        else:
+            steps = _selector.select(intent_obj)
+
+        results: list[dict] = []
+        last_result: dict | None = None
+        for step in steps:
+            result = self._execute_step(step, last_result)
+            result["_step_label"] = step.get("label", "")
+            result["_tool"] = f"{step['agent']}.{step['method']}"
+            results.append(result)
+            if not result.get("error"):
+                last_result = result
+
+        return results
+
     def query(
         self,
         user_query: str,
@@ -431,10 +493,10 @@ class PlannerAgent:
             if using_llm:
                 agent_results = self._run_llm(user_query, history)
             else:
-                agent_results = _keyword_fallback(user_query)
+                agent_results = self._run_orchestrated(user_query, history)
         except Exception as exc:
             logger.warning("LLM call failed, falling back to keyword routing: %s", exc, exc_info=True)
-            agent_results = _keyword_fallback(user_query)
+            agent_results = self._run_orchestrated(user_query, history)
             using_llm = False
             llm_fallback_reason = f"Hugging Face error: {exc!s}"
 

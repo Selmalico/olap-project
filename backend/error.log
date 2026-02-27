@@ -1,0 +1,867 @@
+2026-02-24 14:59:07,200 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-02-24 14:59:35,813 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-02-24 14:59:52,763 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-02-24 15:00:32,974 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-02-24 15:06:13,927 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-02-24 15:06:13,928 [INFO] Retrying request to /chat/completions in 0.404858 seconds
+2026-02-24 15:06:14,974 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-02-24 15:06:14,975 [INFO] Retrying request to /chat/completions in 0.821622 seconds
+2026-02-24 15:06:16,394 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-02-24 15:06:42,761 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-02-24 15:06:42,763 [INFO] Retrying request to /chat/completions in 0.410919 seconds
+2026-02-24 15:06:44,185 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-02-24 15:06:44,187 [INFO] Retrying request to /chat/completions in 0.986253 seconds
+2026-02-24 15:06:45,384 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-02-24 15:09:13,762 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-02-24 15:09:13,763 [INFO] Retrying request to /chat/completions in 0.409908 seconds
+2026-02-24 15:09:14,894 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-02-24 15:09:14,894 [INFO] Retrying request to /chat/completions in 0.905676 seconds
+2026-02-24 15:09:16,058 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-02-24 15:09:30,862 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-02-24 15:09:30,863 [INFO] Retrying request to /chat/completions in 0.402872 seconds
+2026-02-24 15:09:31,588 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-02-24 15:09:31,589 [INFO] Retrying request to /chat/completions in 0.833551 seconds
+2026-02-24 15:09:32,633 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-02-24 15:10:06,079 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-02-24 15:10:06,080 [INFO] Retrying request to /chat/completions in 0.465489 seconds
+2026-02-24 15:10:06,767 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-02-24 15:10:06,768 [INFO] Retrying request to /chat/completions in 0.850145 seconds
+2026-02-24 15:10:07,827 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-02-24 15:13:14,937 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-02-24 15:13:14,939 [INFO] Retrying request to /chat/completions in 0.431222 seconds
+2026-02-24 15:13:15,655 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-02-24 15:13:15,656 [INFO] Retrying request to /chat/completions in 0.956072 seconds
+2026-02-24 15:13:16,812 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-02-24 15:13:16,815 [WARNING] LLM call failed, falling back to keyword routing: Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}
+Traceback (most recent call last):
+  File "/Users/joanshameti/Documents/selma/backend/agents/planner.py", line 444, in query
+    agent_results = self._run_llm(user_query, history)
+  File "/Users/joanshameti/Documents/selma/backend/agents/planner.py", line 396, in _run_llm
+    response = self._llm_client.chat.completions.create(
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/openai/resources/chat/completions/completions.py", line 1204, in create
+    return self._post(
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}
+2026-02-25 17:03:58,831 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-02-25 17:03:58,832 [INFO] Retrying request to /chat/completions in 0.484880 seconds
+2026-02-25 17:03:59,588 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-02-25 17:03:59,589 [INFO] Retrying request to /chat/completions in 0.849543 seconds
+2026-02-25 17:04:01,203 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-02-25 17:04:01,207 [WARNING] LLM call failed, falling back to keyword routing: Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}
+Traceback (most recent call last):
+  File "/Users/joanshameti/Documents/selma/backend/agents/planner.py", line 529, in query
+    agent_results = self._run_llm(user_query, history)
+  File "/Users/joanshameti/Documents/selma/backend/agents/planner.py", line 480, in _run_llm
+    response = self._openai_client.chat.completions.create(
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/openai/resources/chat/completions/completions.py", line 1204, in create
+    return self._post(
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}
+2026-02-25 17:04:11,446 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-02-25 17:04:11,448 [INFO] Retrying request to /chat/completions in 0.391300 seconds
+2026-02-25 17:04:12,154 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-02-25 17:04:12,157 [INFO] Retrying request to /chat/completions in 0.990873 seconds
+2026-02-25 17:04:13,874 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-02-25 17:04:13,876 [WARNING] LLM call failed, falling back to keyword routing: Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}
+Traceback (most recent call last):
+  File "/Users/joanshameti/Documents/selma/backend/agents/planner.py", line 529, in query
+    agent_results = self._run_llm(user_query, history)
+  File "/Users/joanshameti/Documents/selma/backend/agents/planner.py", line 480, in _run_llm
+    response = self._openai_client.chat.completions.create(
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/openai/resources/chat/completions/completions.py", line 1204, in create
+    return self._post(
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}
+2026-02-25 17:06:53,124 [WARNING] LLM call failed, falling back to keyword routing: 404 models/gemini-1.5-pro is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+Traceback (most recent call last):
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/google/api_core/grpc_helpers.py", line 55, in error_remapped_callable
+    return callable_(*args, **kwargs)
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/grpc/_interceptor.py", line 276, in __call__
+    response, ignored_call = self._with_call(
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/grpc/_interceptor.py", line 331, in _with_call
+    return call.result(), call
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/grpc/_channel.py", line 438, in result
+    raise self
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/grpc/_interceptor.py", line 314, in continuation
+    response, call = self._thunk(new_method).with_call(
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/grpc/_channel.py", line 1173, in with_call
+    return _end_unary_response_blocking(state, call, True, None)
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/grpc/_channel.py", line 990, in _end_unary_response_blocking
+    raise _InactiveRpcError(state)  # pytype: disable=not-instantiable
+grpc._channel._InactiveRpcError: <_InactiveRpcError of RPC that terminated with:
+	status = StatusCode.NOT_FOUND
+	details = "models/gemini-1.5-pro is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods."
+	debug_error_string = "UNKNOWN:Error received from peer ipv4:172.217.168.138:443 {grpc_status:5, grpc_message:"models/gemini-1.5-pro is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods."}"
+>
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/joanshameti/Documents/selma/backend/agents/planner.py", line 529, in query
+    agent_results = self._run_llm(user_query, history)
+  File "/Users/joanshameti/Documents/selma/backend/agents/planner.py", line 472, in _run_llm
+    return self._run_gemini(query, history)
+  File "/Users/joanshameti/Documents/selma/backend/agents/planner.py", line 426, in _run_gemini
+    response = chat.send_message(query)
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/google/generativeai/generative_models.py", line 578, in send_message
+    response = self.model.generate_content(
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/google/generativeai/generative_models.py", line 331, in generate_content
+    response = self._client.generate_content(
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/google/ai/generativelanguage_v1beta/services/generative_service/client.py", line 835, in generate_content
+    response = rpc(
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/google/api_core/gapic_v1/method.py", line 128, in __call__
+    return wrapped_func(*args, **kwargs)
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/google/api_core/retry/retry_unary.py", line 294, in retry_wrapped_func
+    return retry_target(
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/google/api_core/retry/retry_unary.py", line 156, in retry_target
+    next_sleep = _retry_error_helper(
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/google/api_core/retry/retry_base.py", line 216, in _retry_error_helper
+    raise final_exc from source_exc
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/google/api_core/retry/retry_unary.py", line 147, in retry_target
+    result = target()
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/google/api_core/timeout.py", line 130, in func_with_timeout
+    return func(*args, **kwargs)
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/google/api_core/grpc_helpers.py", line 57, in error_remapped_callable
+    raise exceptions.from_grpc_error(exc) from exc
+google.api_core.exceptions.NotFound: 404 models/gemini-1.5-pro is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+2026-02-25 17:06:53,265 [WARNING] Gemini summary generation failed: 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+2026-02-25 17:06:53,417 [WARNING] Gemini summary generation failed: 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+2026-02-25 17:08:56,627 [WARNING] LLM call failed, falling back to keyword routing: 404 models/gemini-1.5-pro is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+Traceback (most recent call last):
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/google/api_core/grpc_helpers.py", line 55, in error_remapped_callable
+    return callable_(*args, **kwargs)
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/grpc/_interceptor.py", line 276, in __call__
+    response, ignored_call = self._with_call(
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/grpc/_interceptor.py", line 331, in _with_call
+    return call.result(), call
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/grpc/_channel.py", line 438, in result
+    raise self
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/grpc/_interceptor.py", line 314, in continuation
+    response, call = self._thunk(new_method).with_call(
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/grpc/_channel.py", line 1173, in with_call
+    return _end_unary_response_blocking(state, call, True, None)
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/grpc/_channel.py", line 990, in _end_unary_response_blocking
+    raise _InactiveRpcError(state)  # pytype: disable=not-instantiable
+grpc._channel._InactiveRpcError: <_InactiveRpcError of RPC that terminated with:
+	status = StatusCode.NOT_FOUND
+	details = "models/gemini-1.5-pro is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods."
+	debug_error_string = "UNKNOWN:Error received from peer ipv4:192.178.202.95:443 {grpc_status:5, grpc_message:"models/gemini-1.5-pro is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods."}"
+>
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/joanshameti/Documents/selma/backend/agents/planner.py", line 529, in query
+    agent_results = self._run_llm(user_query, history)
+  File "/Users/joanshameti/Documents/selma/backend/agents/planner.py", line 472, in _run_llm
+    return self._run_gemini(query, history)
+  File "/Users/joanshameti/Documents/selma/backend/agents/planner.py", line 426, in _run_gemini
+    response = chat.send_message(query)
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/google/generativeai/generative_models.py", line 578, in send_message
+    response = self.model.generate_content(
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/google/generativeai/generative_models.py", line 331, in generate_content
+    response = self._client.generate_content(
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/google/ai/generativelanguage_v1beta/services/generative_service/client.py", line 835, in generate_content
+    response = rpc(
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/google/api_core/gapic_v1/method.py", line 128, in __call__
+    return wrapped_func(*args, **kwargs)
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/google/api_core/retry/retry_unary.py", line 294, in retry_wrapped_func
+    return retry_target(
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/google/api_core/retry/retry_unary.py", line 156, in retry_target
+    next_sleep = _retry_error_helper(
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/google/api_core/retry/retry_base.py", line 216, in _retry_error_helper
+    raise final_exc from source_exc
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/google/api_core/retry/retry_unary.py", line 147, in retry_target
+    result = target()
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/google/api_core/timeout.py", line 130, in func_with_timeout
+    return func(*args, **kwargs)
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/google/api_core/grpc_helpers.py", line 57, in error_remapped_callable
+    raise exceptions.from_grpc_error(exc) from exc
+google.api_core.exceptions.NotFound: 404 models/gemini-1.5-pro is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+2026-02-25 17:08:56,758 [WARNING] Gemini summary generation failed: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash
+Please retry in 3.242589073s. [links {
+  description: "Learn more about Gemini API quotas"
+  url: "https://ai.google.dev/gemini-api/docs/rate-limits"
+}
+, violations {
+  quota_metric: "generativelanguage.googleapis.com/generate_content_free_tier_input_token_count"
+  quota_id: "GenerateContentInputTokensPerModelPerMinute-FreeTier"
+  quota_dimensions {
+    key: "model"
+    value: "gemini-2.0-flash"
+  }
+  quota_dimensions {
+    key: "location"
+    value: "global"
+  }
+}
+violations {
+  quota_metric: "generativelanguage.googleapis.com/generate_content_free_tier_requests"
+  quota_id: "GenerateRequestsPerMinutePerProjectPerModel-FreeTier"
+  quota_dimensions {
+    key: "model"
+    value: "gemini-2.0-flash"
+  }
+  quota_dimensions {
+    key: "location"
+    value: "global"
+  }
+}
+violations {
+  quota_metric: "generativelanguage.googleapis.com/generate_content_free_tier_requests"
+  quota_id: "GenerateRequestsPerDayPerProjectPerModel-FreeTier"
+  quota_dimensions {
+    key: "model"
+    value: "gemini-2.0-flash"
+  }
+  quota_dimensions {
+    key: "location"
+    value: "global"
+  }
+}
+, retry_delay {
+  seconds: 3
+}
+]
+2026-02-25 17:08:56,844 [WARNING] Gemini summary generation failed: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash
+Please retry in 3.156818474s. [links {
+  description: "Learn more about Gemini API quotas"
+  url: "https://ai.google.dev/gemini-api/docs/rate-limits"
+}
+, violations {
+  quota_metric: "generativelanguage.googleapis.com/generate_content_free_tier_input_token_count"
+  quota_id: "GenerateContentInputTokensPerModelPerMinute-FreeTier"
+  quota_dimensions {
+    key: "model"
+    value: "gemini-2.0-flash"
+  }
+  quota_dimensions {
+    key: "location"
+    value: "global"
+  }
+}
+violations {
+  quota_metric: "generativelanguage.googleapis.com/generate_content_free_tier_requests"
+  quota_id: "GenerateRequestsPerMinutePerProjectPerModel-FreeTier"
+  quota_dimensions {
+    key: "model"
+    value: "gemini-2.0-flash"
+  }
+  quota_dimensions {
+    key: "location"
+    value: "global"
+  }
+}
+violations {
+  quota_metric: "generativelanguage.googleapis.com/generate_content_free_tier_requests"
+  quota_id: "GenerateRequestsPerDayPerProjectPerModel-FreeTier"
+  quota_dimensions {
+    key: "model"
+    value: "gemini-2.0-flash"
+  }
+  quota_dimensions {
+    key: "location"
+    value: "global"
+  }
+}
+, retry_delay {
+  seconds: 3
+}
+]
+2026-02-25 17:11:47,450 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-02-25 17:11:47,452 [INFO] Retrying request to /chat/completions in 0.445395 seconds
+2026-02-25 17:11:48,128 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-02-25 17:11:48,129 [INFO] Retrying request to /chat/completions in 0.757427 seconds
+2026-02-25 17:11:49,121 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-02-25 17:11:49,125 [WARNING] LLM call failed, falling back to keyword routing: Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}
+Traceback (most recent call last):
+  File "/Users/joanshameti/Documents/selma/backend/agents/planner.py", line 495, in query
+    agent_results = self._run_llm(user_query, history)
+  File "/Users/joanshameti/Documents/selma/backend/agents/planner.py", line 446, in _run_llm
+    response = self._openai_client.chat.completions.create(
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/openai/resources/chat/completions/completions.py", line 1204, in create
+    return self._post(
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}
+2026-02-25 17:11:49,417 [WARNING] Gemini summary generation failed: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash
+Please retry in 10.583919099s. [links {
+  description: "Learn more about Gemini API quotas"
+  url: "https://ai.google.dev/gemini-api/docs/rate-limits"
+}
+, violations {
+  quota_metric: "generativelanguage.googleapis.com/generate_content_free_tier_requests"
+  quota_id: "GenerateRequestsPerDayPerProjectPerModel-FreeTier"
+  quota_dimensions {
+    key: "model"
+    value: "gemini-2.0-flash"
+  }
+  quota_dimensions {
+    key: "location"
+    value: "global"
+  }
+}
+violations {
+  quota_metric: "generativelanguage.googleapis.com/generate_content_free_tier_requests"
+  quota_id: "GenerateRequestsPerMinutePerProjectPerModel-FreeTier"
+  quota_dimensions {
+    key: "model"
+    value: "gemini-2.0-flash"
+  }
+  quota_dimensions {
+    key: "location"
+    value: "global"
+  }
+}
+violations {
+  quota_metric: "generativelanguage.googleapis.com/generate_content_free_tier_input_token_count"
+  quota_id: "GenerateContentInputTokensPerModelPerMinute-FreeTier"
+  quota_dimensions {
+    key: "model"
+    value: "gemini-2.0-flash"
+  }
+  quota_dimensions {
+    key: "location"
+    value: "global"
+  }
+}
+, retry_delay {
+  seconds: 10
+}
+]
+2026-02-25 17:11:49,529 [WARNING] Gemini summary generation failed: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash
+Please retry in 10.490665141s. [links {
+  description: "Learn more about Gemini API quotas"
+  url: "https://ai.google.dev/gemini-api/docs/rate-limits"
+}
+, violations {
+  quota_metric: "generativelanguage.googleapis.com/generate_content_free_tier_requests"
+  quota_id: "GenerateRequestsPerDayPerProjectPerModel-FreeTier"
+  quota_dimensions {
+    key: "model"
+    value: "gemini-2.0-flash"
+  }
+  quota_dimensions {
+    key: "location"
+    value: "global"
+  }
+}
+violations {
+  quota_metric: "generativelanguage.googleapis.com/generate_content_free_tier_requests"
+  quota_id: "GenerateRequestsPerMinutePerProjectPerModel-FreeTier"
+  quota_dimensions {
+    key: "model"
+    value: "gemini-2.0-flash"
+  }
+  quota_dimensions {
+    key: "location"
+    value: "global"
+  }
+}
+violations {
+  quota_metric: "generativelanguage.googleapis.com/generate_content_free_tier_input_token_count"
+  quota_id: "GenerateContentInputTokensPerModelPerMinute-FreeTier"
+  quota_dimensions {
+    key: "model"
+    value: "gemini-2.0-flash"
+  }
+  quota_dimensions {
+    key: "location"
+    value: "global"
+  }
+}
+, retry_delay {
+  seconds: 10
+}
+]
+2026-02-25 17:18:12,389 [INFO] HTTP Request: POST https://router.huggingface.co/v1/chat/completions "HTTP/1.1 400 Bad Request"
+2026-02-25 17:18:12,392 [WARNING] LLM call failed, falling back to keyword routing: (Request ID: Root=1-699f20c4-20bf2ad351a5d47927cb32fc;4a85ff90-8f5e-4adb-8e07-d8e713aa25ab)
+
+Bad request:
+{'message': "The requested model 'google/gemma-2-9b-it' is not supported by any provider you have enabled.", 'type': 'invalid_request_error', 'param': 'model', 'code': 'model_not_supported'}
+Traceback (most recent call last):
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/huggingface_hub/utils/_http.py", line 657, in hf_raise_for_status
+    response.raise_for_status()
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/httpx/_models.py", line 829, in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+httpx.HTTPStatusError: Client error '400 Bad Request' for url 'https://router.huggingface.co/v1/chat/completions'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/joanshameti/Documents/selma/backend/agents/planner.py", line 538, in query
+    agent_results = self._run_llm(user_query, history)
+  File "/Users/joanshameti/Documents/selma/backend/agents/planner.py", line 522, in _run_llm
+    return self._run_huggingface(query, history)
+  File "/Users/joanshameti/Documents/selma/backend/agents/planner.py", line 446, in _run_huggingface
+    response = self._hf_client.chat_completion(
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/huggingface_hub/inference/_client.py", line 933, in chat_completion
+    data = self._inner_post(request_parameters, stream=stream)
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/huggingface_hub/inference/_client.py", line 286, in _inner_post
+    hf_raise_for_status(response)
+  File "/Users/joanshameti/Documents/selma/.venv/lib/python3.9/site-packages/huggingface_hub/utils/_http.py", line 716, in hf_raise_for_status
+    raise _format(BadRequestError, message, response) from e
+huggingface_hub.errors.BadRequestError: (Request ID: Root=1-699f20c4-20bf2ad351a5d47927cb32fc;4a85ff90-8f5e-4adb-8e07-d8e713aa25ab)
+
+Bad request:
+{'message': "The requested model 'google/gemma-2-9b-it' is not supported by any provider you have enabled.", 'type': 'invalid_request_error', 'param': 'model', 'code': 'model_not_supported'}
+2026-02-25 17:18:12,762 [WARNING] Gemini summary generation failed: 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+2026-02-25 17:18:12,903 [WARNING] Gemini summary generation failed: 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+2026-02-25 17:19:32,602 [INFO] HTTP Request: POST https://router.huggingface.co/v1/chat/completions "HTTP/1.1 200 OK"
+2026-02-25 17:19:32,611 [WARNING] LLM call failed, falling back to keyword routing: Parser Error: syntax error at or near ","
+
+LINE 2:         SELECT , SUM(fs.revenue) AS total_revenue,
+                       ^
+Traceback (most recent call last):
+  File "/Users/joanshameti/Documents/selma/backend/agents/planner.py", line 539, in query
+    agent_results = self._run_llm(user_query, history)
+  File "/Users/joanshameti/Documents/selma/backend/agents/planner.py", line 523, in _run_llm
+    return self._run_huggingface(query, history)
+  File "/Users/joanshameti/Documents/selma/backend/agents/planner.py", line 462, in _run_huggingface
+    result = _dispatch(name, args)
+  File "/Users/joanshameti/Documents/selma/backend/agents/planner.py", line 246, in _dispatch
+    return _cube.slice(**args)
+  File "/Users/joanshameti/Documents/selma/backend/agents/cube_operations.py", line 102, in slice
+    df = get_db().execute(sql).df()
+_duckdb.ParserException: Parser Error: syntax error at or near ","
+
+LINE 2:         SELECT , SUM(fs.revenue) AS total_revenue,
+                       ^
+2026-02-25 17:19:32,867 [WARNING] Gemini summary generation failed: 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+2026-02-25 17:19:32,971 [WARNING] Gemini summary generation failed: 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+2026-02-25 17:23:35,654 [INFO] HTTP Request: POST https://router.huggingface.co/v1/chat/completions "HTTP/1.1 200 OK"
+2026-02-25 17:23:38,081 [INFO] HTTP Request: POST https://router.huggingface.co/v1/chat/completions "HTTP/1.1 200 OK"
+2026-02-25 17:23:53,016 [INFO] HTTP Request: POST https://router.huggingface.co/v1/chat/completions "HTTP/1.1 200 OK"
+2026-02-25 17:24:04,388 [INFO] HTTP Request: POST https://router.huggingface.co/v1/chat/completions "HTTP/1.1 200 OK"
+2026-02-25 17:24:11,658 [INFO] HTTP Request: POST https://router.huggingface.co/v1/chat/completions "HTTP/1.1 200 OK"
+2026-02-25 17:24:13,617 [INFO] HTTP Request: POST https://router.huggingface.co/v1/chat/completions "HTTP/1.1 200 OK"
+2026-02-25 17:24:30,456 [INFO] HTTP Request: POST https://router.huggingface.co/v1/chat/completions "HTTP/1.1 200 OK"
+2026-02-25 17:24:30,462 [WARNING] LLM call failed, falling back to keyword routing: Binder Error: Referenced column "office_supplies" not found in FROM clause!
+Candidate bindings: "profit_margin", "profit", "order_date", "unit_price", "dp.product_id"
+
+LINE 12:         GROUP BY dd.year , office_supplies
+                                    ^
+Traceback (most recent call last):
+  File "/Users/joanshameti/Documents/selma/backend/agents/planner.py", line 429, in query
+    agent_results = self._run_llm(user_query, history)
+  File "/Users/joanshameti/Documents/selma/backend/agents/planner.py", line 412, in _run_llm
+    result = _dispatch(name, args)
+  File "/Users/joanshameti/Documents/selma/backend/agents/planner.py", line 251, in _dispatch
+    return _kpi.yoy_growth(**args)
+  File "/Users/joanshameti/Documents/selma/backend/agents/kpi_calculator.py", line 87, in yoy_growth
+    df = get_db().execute(sql).df()
+_duckdb.BinderException: Binder Error: Referenced column "office_supplies" not found in FROM clause!
+Candidate bindings: "profit_margin", "profit", "order_date", "unit_price", "dp.product_id"
+
+LINE 12:         GROUP BY dd.year , office_supplies
+                                    ^
+2026-02-25 17:24:32,651 [INFO] HTTP Request: POST https://router.huggingface.co/v1/chat/completions "HTTP/1.1 200 OK"
+2026-02-25 17:26:44,614 [INFO] HTTP Request: POST https://router.huggingface.co/v1/chat/completions "HTTP/1.1 200 OK"
+2026-02-25 17:26:46,328 [INFO] HTTP Request: POST https://router.huggingface.co/v1/chat/completions "HTTP/1.1 200 OK"
+2026-02-25 17:26:56,206 [INFO] HTTP Request: POST https://router.huggingface.co/v1/chat/completions "HTTP/1.1 200 OK"
+2026-02-25 17:26:57,796 [INFO] HTTP Request: POST https://router.huggingface.co/v1/chat/completions "HTTP/1.1 200 OK"
+2026-02-25 17:27:07,681 [INFO] HTTP Request: POST https://router.huggingface.co/v1/chat/completions "HTTP/1.1 200 OK"
+2026-02-25 17:27:17,636 [INFO] HTTP Request: POST https://router.huggingface.co/v1/chat/completions "HTTP/1.1 200 OK"
+2026-02-25 17:27:19,610 [INFO] HTTP Request: POST https://router.huggingface.co/v1/chat/completions "HTTP/1.1 200 OK"
+2026-02-25 17:27:28,340 [INFO] HTTP Request: POST https://router.huggingface.co/v1/chat/completions "HTTP/1.1 200 OK"
+2026-02-25 17:27:30,014 [INFO] HTTP Request: POST https://router.huggingface.co/v1/chat/completions "HTTP/1.1 200 OK"
+2026-02-25 17:27:45,820 [INFO] HTTP Request: POST https://router.huggingface.co/v1/chat/completions "HTTP/1.1 200 OK"
+2026-02-25 17:27:46,891 [INFO] HTTP Request: POST https://router.huggingface.co/v1/chat/completions "HTTP/1.1 200 OK"
+2026-02-25 17:27:59,390 [INFO] HTTP Request: POST https://router.huggingface.co/v1/chat/completions "HTTP/1.1 200 OK"
+2026-02-25 17:29:23,326 [INFO] HTTP Request: POST https://router.huggingface.co/v1/chat/completions "HTTP/1.1 200 OK"
+2026-02-25 17:29:30,688 [INFO] HTTP Request: POST https://router.huggingface.co/v1/chat/completions "HTTP/1.1 200 OK"
+2026-02-25 17:29:42,440 [INFO] HTTP Request: POST https://router.huggingface.co/v1/chat/completions "HTTP/1.1 200 OK"
+2026-02-25 17:29:47,170 [INFO] HTTP Request: POST https://router.huggingface.co/v1/chat/completions "HTTP/1.1 200 OK"
+2026-02-25 17:29:55,565 [INFO] HTTP Request: POST https://router.huggingface.co/v1/chat/completions "HTTP/1.1 200 OK"
+2026-02-25 17:30:02,958 [INFO] HTTP Request: POST https://router.huggingface.co/v1/chat/completions "HTTP/1.1 200 OK"
+2026-02-25 17:31:19,857 [INFO] HTTP Request: POST https://router.huggingface.co/v1/chat/completions "HTTP/1.1 200 OK"
+2026-02-25 17:31:33,073 [INFO] HTTP Request: POST https://router.huggingface.co/v1/chat/completions "HTTP/1.1 200 OK"
+2026-02-25 22:46:01,700 [ERROR] Request POST /api/olap/pivot failed: 'str' object has no attribute 'keys'
+Traceback (most recent call last):
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\main.py", line 74, in log_errors
+    return await call_next(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 95, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 153, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 119, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 105, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 424, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 312, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\routers\olap.py", line 138, in pivot_cube
+    return JSONResponse(content=sanitize({"data": result, "report": _rpt.generate_table(result, add_totals=False)}))
+                                                                    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\agents\report_generator.py", line 97, in generate_table
+    columns = data.get("columns", data.get("columns_list", list(rows[0].keys()) if rows else []))
+                                                                ^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'keys'
+
+2026-02-25 22:46:01,711 [ERROR] Unhandled exception: 'str' object has no attribute 'keys'
+Traceback (most recent call last):
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 191, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+                                   ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_utils.py", line 87, in collapse_excgroups
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\main.py", line 74, in log_errors
+    return await call_next(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 95, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 153, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 119, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 105, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 424, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 312, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\routers\olap.py", line 138, in pivot_cube
+    return JSONResponse(content=sanitize({"data": result, "report": _rpt.generate_table(result, add_totals=False)}))
+                                                                    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\agents\report_generator.py", line 97, in generate_table
+    columns = data.get("columns", data.get("columns_list", list(rows[0].keys()) if rows else []))
+                                                                ^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'keys'
+
+2026-02-25 23:24:03,143 [ERROR] Request POST /api/olap/pivot failed: 'str' object has no attribute 'keys'
+Traceback (most recent call last):
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\main.py", line 74, in log_errors
+    return {"status": "sent", "to": request.to_email}
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 95, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 153, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 119, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 105, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 424, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 312, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\routers\olap.py", line 138, in pivot_cube
+    return JSONResponse(content=sanitize({"data": result, "report": _rpt.generate_table(result, add_totals=False)}))
+                                                                    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\agents\report_generator.py", line 97, in generate_table
+    columns = data.get("columns", data.get("columns_list", list(rows[0].keys()) if rows else []))
+                                                                ^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'keys'
+
+2026-02-25 23:24:03,149 [ERROR] Unhandled exception: 'str' object has no attribute 'keys'
+Traceback (most recent call last):
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 191, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+                                   ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_utils.py", line 87, in collapse_excgroups
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\main.py", line 74, in log_errors
+    return {"status": "sent", "to": request.to_email}
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 95, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 153, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 119, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 105, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 424, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 312, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\routers\olap.py", line 138, in pivot_cube
+    return JSONResponse(content=sanitize({"data": result, "report": _rpt.generate_table(result, add_totals=False)}))
+                                                                    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\agents\report_generator.py", line 97, in generate_table
+    columns = data.get("columns", data.get("columns_list", list(rows[0].keys()) if rows else []))
+                                                                ^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'keys'
+
+2026-02-25 23:24:15,984 [ERROR] Request POST /api/olap/pivot failed: 'str' object has no attribute 'keys'
+Traceback (most recent call last):
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\main.py", line 74, in log_errors
+    return {"status": "sent", "to": request.to_email}
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 95, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 153, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 119, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 105, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 424, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 312, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\routers\olap.py", line 138, in pivot_cube
+    return JSONResponse(content=sanitize({"data": result, "report": _rpt.generate_table(result, add_totals=False)}))
+                                                                    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\agents\report_generator.py", line 97, in generate_table
+    columns = data.get("columns", data.get("columns_list", list(rows[0].keys()) if rows else []))
+                                                                ^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'keys'
+
+2026-02-25 23:24:15,992 [ERROR] Unhandled exception: 'str' object has no attribute 'keys'
+Traceback (most recent call last):
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 191, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+                                   ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_utils.py", line 87, in collapse_excgroups
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\main.py", line 74, in log_errors
+    return {"status": "sent", "to": request.to_email}
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 95, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 153, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 119, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 105, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 424, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 312, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\routers\olap.py", line 138, in pivot_cube
+    return JSONResponse(content=sanitize({"data": result, "report": _rpt.generate_table(result, add_totals=False)}))
+                                                                    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\agents\report_generator.py", line 97, in generate_table
+    columns = data.get("columns", data.get("columns_list", list(rows[0].keys()) if rows else []))
+                                                                ^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'keys'
+

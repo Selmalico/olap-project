@@ -1,8 +1,31 @@
+"""
+Orchestrator — plan_and_execute()
+──────────────────────────────────
+Coordinates the 7-agent pipeline.
+
+All seven agents are real implementations (no phantom imports):
+  dimension_navigator  → DimensionNavigatorAgent
+  cube_operations      → CubeOperationsAgent
+  kpi_calculator       → KPICalculatorAgent
+  report_generator     → ReportGeneratorAgent
+  visualization_agent  → VisualizationAgent
+  anomaly_detection    → AnomalyDetectionAgent
+  executive_summary    → ExecutiveSummaryAgent
+
+The IntentDetector provides a fast rule-based routing signal that enriches
+the LLM planner's context and acts as a complete fallback when no LLM key
+is configured.
+"""
+
+from __future__ import annotations
+
 import json
+import logging
+import os
 import re
 import uuid
-from anthropic import Anthropic
-from config import settings
+from typing import Any
+
 from agents.dimension_navigator import DimensionNavigatorAgent
 from agents.cube_operations import CubeOperationsAgent
 from agents.kpi_calculator import KPICalculatorAgent
@@ -11,17 +34,37 @@ from agents.visualization_agent import VisualizationAgent
 from agents.anomaly_detection import AnomalyDetectionAgent
 from agents.executive_summary import ExecutiveSummaryAgent
 from orchestrator.context_manager import add_turn
+from orchestrator.intent_detector import IntentDetector
 
-client = Anthropic(api_key=settings.anthropic_api_key)
+logger = logging.getLogger("selma")
 
-AGENTS = {
+# ── Anthropic client (optional) ───────────────────────────────────────────────
+_client = None
+try:
+    from anthropic import Anthropic
+    _api_key = os.getenv("ANTHROPIC_API_KEY", "")
+    if not _api_key:
+        try:
+            from config import settings
+            _api_key = settings.anthropic_api_key
+        except Exception:
+            pass
+    if _api_key:
+        _client = Anthropic(api_key=_api_key)
+        logger.info("Anthropic client enabled for orchestrator planner")
+except Exception as e:
+    logger.info("Anthropic client not available: %s", e)
+
+_intent_detector = IntentDetector()
+
+AGENTS: dict[str, Any] = {
     "dimension_navigator": DimensionNavigatorAgent(),
-    "cube_operations": CubeOperationsAgent(),
-    "kpi_calculator": KPICalculatorAgent(),
-    "report_generator": ReportGeneratorAgent(),
+    "cube_operations":     CubeOperationsAgent(),
+    "kpi_calculator":      KPICalculatorAgent(),
+    "report_generator":    ReportGeneratorAgent(),
     "visualization_agent": VisualizationAgent(),
-    "anomaly_detection": AnomalyDetectionAgent(),
-    "executive_summary": ExecutiveSummaryAgent(),
+    "anomaly_detection":   AnomalyDetectionAgent(),
+    "executive_summary":   ExecutiveSummaryAgent(),
 }
 
 PLANNER_SYSTEM = """You are an OLAP Query Planner. Analyze the user's query and return a routing plan.
@@ -54,43 +97,39 @@ Return ONLY valid JSON:
 }"""
 
 
-def plan_and_execute(query: str, history: list, conversation_id: str = None) -> dict:
+def plan_and_execute(
+    query: str,
+    history: list,
+    conversation_id: str | None = None,
+) -> dict:
     if not conversation_id:
         conversation_id = str(uuid.uuid4())
 
-    # Step 1: Get routing plan
-    plan_msg = f"User query: {query}\nConversation turns so far: {len(history)}"
-    plan_response = client.messages.create(
-        model=settings.model,
-        max_tokens=1000,
-        system=PLANNER_SYSTEM,
-        messages=[{"role": "user", "content": plan_msg}]
-    )
-    plan_text = plan_response.content[0].text
-    match = re.search(r'\{.*\}', plan_text, re.DOTALL)
-    if not match:
-        raise ValueError(f"Planner returned no JSON: {plan_text}")
-    plan = json.loads(match.group())
+    # Rule-based intent detection (always runs, enriches LLM context)
+    intent_obj = _intent_detector.detect(query, history)
 
-    # Step 2: Execute agents in sequence
-    results = []
-    accumulated_data = []
-    agent_names_used = []
-    accumulated_anomalies = []
+    # Step 1: Get routing plan (LLM or rule-based fallback)
+    plan = _get_plan(query, history, intent_obj)
+
+    # Step 2: Execute agents in sequence, passing accumulated data forward
+    results: list[dict] = []
+    accumulated_data: list[dict] = []
+    accumulated_anomalies: list[str] = []
+    agent_names_used: list[str] = []
 
     for agent_name in plan.get("agents", []):
         if agent_name not in AGENTS:
             continue
         agent = AGENTS[agent_name]
-        params = {
+        params: dict[str, Any] = {
             **plan.get("parameters", {}),
             "data": accumulated_data,
             "anomalies": accumulated_anomalies,
-            "kpis": {}
+            "kpis": {},
+            "operation": intent_obj.get("intent", ""),
         }
         try:
             result = agent.run(query, params)
-            # Accumulate data for downstream agents
             if result.get("data"):
                 accumulated_data = result["data"]
             if result.get("anomalies"):
@@ -98,26 +137,27 @@ def plan_and_execute(query: str, history: list, conversation_id: str = None) -> 
             results.append({"agent_name": agent_name, **result})
             agent_names_used.append(agent_name)
         except Exception as e:
+            logger.warning("Agent %s failed: %s", agent_name, e)
             results.append({"agent_name": agent_name, "error": str(e), "data": None})
 
-    # Step 3: Ensure executive summary runs with full context
+    # Step 3: Ensure executive summary always runs with full context
     if "executive_summary" not in agent_names_used and accumulated_data:
         try:
             summary_result = AGENTS["executive_summary"].run(
                 query,
-                {"data": accumulated_data, "kpis": {}, "anomalies": accumulated_anomalies}
+                {"data": accumulated_data, "kpis": {}, "anomalies": accumulated_anomalies},
             )
             results.append({"agent_name": "executive_summary", **summary_result})
             agent_names_used.append("executive_summary")
         except Exception as e:
-            pass
+            logger.warning("ExecutiveSummary fallback failed: %s", e)
 
     exec_summary = next(
         (r.get("narrative") for r in results if r.get("agent_name") == "executive_summary"),
-        None
+        None,
     )
 
-    # Step 4: Store in conversation history
+    # Step 4: Persist conversation turn
     add_turn(conversation_id, "user", query)
     add_turn(conversation_id, "assistant", exec_summary or "Analysis complete.")
 
@@ -126,5 +166,66 @@ def plan_and_execute(query: str, history: list, conversation_id: str = None) -> 
         "agents_used": agent_names_used,
         "results": results,
         "executive_summary": exec_summary,
-        "follow_up_questions": plan.get("follow_up_questions", [])
+        "follow_up_questions": plan.get("follow_up_questions", []),
+        "intent": intent_obj,
+    }
+
+
+def _get_plan(query: str, history: list, intent_obj: dict) -> dict:
+    """Use LLM for routing plan when available; otherwise use rule-based plan."""
+    if _client:
+        try:
+            plan_msg = (
+                f"User query: {query}\n"
+                f"Detected intent: {intent_obj.get('intent')} "
+                f"(confidence {intent_obj.get('confidence', 0):.2f})\n"
+                f"Conversation turns so far: {len(history)}"
+            )
+            resp = _client.messages.create(
+                model="claude-haiku-4-5",
+                max_tokens=1000,
+                system=PLANNER_SYSTEM,
+                messages=[{"role": "user", "content": plan_msg}],
+            )
+            plan_text = resp.content[0].text
+            match = re.search(r"\{.*\}", plan_text, re.DOTALL)
+            if match:
+                return json.loads(match.group())
+        except Exception as e:
+            logger.warning("LLM planner failed, using rule-based fallback: %s", e)
+
+    return _rule_based_plan(intent_obj)
+
+
+def _rule_based_plan(intent_obj: dict) -> dict:
+    """Build an agent sequence from the detected intent without any LLM call."""
+    intent = intent_obj.get("intent", "top_n")
+
+    intent_to_primary: dict[str, list[str]] = {
+        "drill_down":      ["dimension_navigator"],
+        "roll_up":         ["dimension_navigator"],
+        "describe_hierarchy": ["dimension_navigator"],
+        "slice":           ["cube_operations"],
+        "dice":            ["cube_operations"],
+        "pivot":           ["cube_operations"],
+        "compare_periods": ["kpi_calculator", "anomaly_detection"],
+        "yoy_growth":      ["kpi_calculator", "anomaly_detection"],
+        "mom_change":      ["kpi_calculator"],
+        "top_n":           ["kpi_calculator"],
+        "profit_margins":  ["kpi_calculator"],
+        "revenue_share":   ["kpi_calculator"],
+        "aggregate":       ["kpi_calculator"],
+    }
+    primary = intent_to_primary.get(intent, ["kpi_calculator"])
+    agents = primary + ["report_generator", "visualization_agent", "executive_summary"]
+
+    return {
+        "intent": intent,
+        "agents": agents,
+        "parameters": intent_obj.get("params", {}),
+        "follow_up_questions": [
+            f"Show me the breakdown by region for this data",
+            f"Compare this with the previous period",
+            f"Which segment has the highest profit margin?",
+        ],
     }

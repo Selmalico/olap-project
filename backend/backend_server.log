@@ -1,0 +1,655 @@
+INFO:     Will watch for changes in these directories: ['C:\\Users\\selma_3ct5ekw\\Desktop\\olap\\olap-project\\backend']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [21260] using WatchFiles
+INFO:     Started server process [4916]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+[OK] Database ready: 10,000 fact rows
+INFO:     127.0.0.1:65164 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64967 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51451 - "GET /api/query/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64686 - "GET /api/query/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56177 - "POST /api/query/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55061 - "POST /api/olap/drill-down HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54492 - "POST /api/olap/dice HTTP/1.1" 200 OK
+2026-02-25 22:46:01,700 [ERROR] Request POST /api/olap/pivot failed: 'str' object has no attribute 'keys'
+Traceback (most recent call last):
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\main.py", line 74, in log_errors
+    return await call_next(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 95, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 153, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 119, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 105, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 424, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 312, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\routers\olap.py", line 138, in pivot_cube
+    return JSONResponse(content=sanitize({"data": result, "report": _rpt.generate_table(result, add_totals=False)}))
+                                                                    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\agents\report_generator.py", line 97, in generate_table
+    columns = data.get("columns", data.get("columns_list", list(rows[0].keys()) if rows else []))
+                                                                ^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'keys'
+
+2026-02-25 22:46:01,711 [ERROR] Unhandled exception: 'str' object has no attribute 'keys'
+Traceback (most recent call last):
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 191, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+                                   ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_utils.py", line 87, in collapse_excgroups
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\main.py", line 74, in log_errors
+    return await call_next(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 95, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 153, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 119, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 105, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 424, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 312, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\routers\olap.py", line 138, in pivot_cube
+    return JSONResponse(content=sanitize({"data": result, "report": _rpt.generate_table(result, add_totals=False)}))
+                                                                    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\agents\report_generator.py", line 97, in generate_table
+    columns = data.get("columns", data.get("columns_list", list(rows[0].keys()) if rows else []))
+                                                                ^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'keys'
+
+INFO:     127.0.0.1:55630 - "POST /api/olap/pivot HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\uvicorn\protocols\http\httptools_impl.py", line 416, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        self.scope, self.receive, self.send
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\applications.py", line 1134, in __call__
+    await super().__call__(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\applications.py", line 107, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 191, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+                                   ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_utils.py", line 87, in collapse_excgroups
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\main.py", line 74, in log_errors
+    return await call_next(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 95, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 153, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 119, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 105, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 424, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 312, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\routers\olap.py", line 138, in pivot_cube
+    return JSONResponse(content=sanitize({"data": result, "report": _rpt.generate_table(result, add_totals=False)}))
+                                                                    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\agents\report_generator.py", line 97, in generate_table
+    columns = data.get("columns", data.get("columns_list", list(rows[0].keys()) if rows else []))
+                                                                ^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'keys'
+INFO:     127.0.0.1:53655 - "POST /api/query/ HTTP/1.1" 200 OK
+WARNING:  WatchFiles detected changes in 'tools\email_sender.py', 'models\schemas.py', 'tests\test_agents.py', 'tools\s3_client.py', 'orchestrator\context_manager.py', 'agents\kpi_calculator.py', 'tools\duckdb_executor.py', 'models\__init__.py', 'tools\pdf_generator.py', 'tools\__init__.py', 'agents\__init__.py', 'agents\planner.py', 'orchestrator\planner.py', 'orchestrator\__init__.py', 'main.py', 'agents\report_generator.py', 'agents\cube_operations.py', 'agents\dimension_navigator.py'. Reloading...
+ INFO:     127.0.0.1:60798 - "GET /api/query/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60800 - "GET /api/query/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65472 - "GET /api/query/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65474 - "GET /api/query/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53748 - "POST /api/olap/drill-down HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50094 - "GET /api/query/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53047 - "GET /api/query/dashboard HTTP/1.1" 200 OK
+2026-02-25 23:24:03,143 [ERROR] Request POST /api/olap/pivot failed: 'str' object has no attribute 'keys'
+Traceback (most recent call last):
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\main.py", line 74, in log_errors
+    return {"status": "sent", "to": request.to_email}
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 95, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 153, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 119, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 105, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 424, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 312, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\routers\olap.py", line 138, in pivot_cube
+    return JSONResponse(content=sanitize({"data": result, "report": _rpt.generate_table(result, add_totals=False)}))
+                                                                    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\agents\report_generator.py", line 97, in generate_table
+    columns = data.get("columns", data.get("columns_list", list(rows[0].keys()) if rows else []))
+                                                                ^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'keys'
+
+2026-02-25 23:24:03,149 [ERROR] Unhandled exception: 'str' object has no attribute 'keys'
+Traceback (most recent call last):
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 191, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+                                   ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_utils.py", line 87, in collapse_excgroups
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\main.py", line 74, in log_errors
+    return {"status": "sent", "to": request.to_email}
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 95, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 153, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 119, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 105, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 424, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 312, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\routers\olap.py", line 138, in pivot_cube
+    return JSONResponse(content=sanitize({"data": result, "report": _rpt.generate_table(result, add_totals=False)}))
+                                                                    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\agents\report_generator.py", line 97, in generate_table
+    columns = data.get("columns", data.get("columns_list", list(rows[0].keys()) if rows else []))
+                                                                ^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'keys'
+
+INFO:     127.0.0.1:64971 - "POST /api/olap/pivot HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\uvicorn\protocols\http\httptools_impl.py", line 416, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        self.scope, self.receive, self.send
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\applications.py", line 1134, in __call__
+    await super().__call__(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\applications.py", line 107, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 191, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+                                   ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_utils.py", line 87, in collapse_excgroups
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\main.py", line 74, in log_errors
+    return {"status": "sent", "to": request.to_email}
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 95, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 153, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 119, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 105, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 424, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 312, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\routers\olap.py", line 138, in pivot_cube
+    return JSONResponse(content=sanitize({"data": result, "report": _rpt.generate_table(result, add_totals=False)}))
+                                                                    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\agents\report_generator.py", line 97, in generate_table
+    columns = data.get("columns", data.get("columns_list", list(rows[0].keys()) if rows else []))
+                                                                ^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'keys'
+2026-02-25 23:24:15,984 [ERROR] Request POST /api/olap/pivot failed: 'str' object has no attribute 'keys'
+Traceback (most recent call last):
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\main.py", line 74, in log_errors
+    return {"status": "sent", "to": request.to_email}
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 95, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 153, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 119, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 105, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 424, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 312, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\routers\olap.py", line 138, in pivot_cube
+    return JSONResponse(content=sanitize({"data": result, "report": _rpt.generate_table(result, add_totals=False)}))
+                                                                    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\agents\report_generator.py", line 97, in generate_table
+    columns = data.get("columns", data.get("columns_list", list(rows[0].keys()) if rows else []))
+                                                                ^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'keys'
+
+2026-02-25 23:24:15,992 [ERROR] Unhandled exception: 'str' object has no attribute 'keys'
+Traceback (most recent call last):
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 191, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+                                   ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_utils.py", line 87, in collapse_excgroups
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\main.py", line 74, in log_errors
+    return {"status": "sent", "to": request.to_email}
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 95, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 153, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 119, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 105, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 424, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 312, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\routers\olap.py", line 138, in pivot_cube
+    return JSONResponse(content=sanitize({"data": result, "report": _rpt.generate_table(result, add_totals=False)}))
+                                                                    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\agents\report_generator.py", line 97, in generate_table
+    columns = data.get("columns", data.get("columns_list", list(rows[0].keys()) if rows else []))
+                                                                ^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'keys'
+
+INFO:     127.0.0.1:49363 - "POST /api/olap/pivot HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\uvicorn\protocols\http\httptools_impl.py", line 416, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        self.scope, self.receive, self.send
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\applications.py", line 1134, in __call__
+    await super().__call__(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\applications.py", line 107, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 191, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+                                   ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_utils.py", line 87, in collapse_excgroups
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\main.py", line 74, in log_errors
+    return {"status": "sent", "to": request.to_email}
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 95, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 153, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 119, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 105, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 424, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\selma_3ct5ekw\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 312, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\routers\olap.py", line 138, in pivot_cube
+    return JSONResponse(content=sanitize({"data": result, "report": _rpt.generate_table(result, add_totals=False)}))
+                                                                    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\selma_3ct5ekw\Desktop\olap\olap-project\backend\agents\report_generator.py", line 97, in generate_table
+    columns = data.get("columns", data.get("columns_list", list(rows[0].keys()) if rows else []))
+                                                                ^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'keys'
+INFO:     127.0.0.1:62798 - "GET /api/query/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62800 - "GET /api/query/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50495 - "GET /api/query/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50497 - "GET /api/query/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50803 - "GET /api/query/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50805 - "GET /api/query/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50944 - "GET /api/query/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50946 - "GET /api/query/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62827 - "GET /api/query/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62829 - "GET /api/query/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63681 - "GET /api/query/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63682 - "GET /api/query/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58918 - "POST /api/olap/drill-down HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61024 - "GET /api/query/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61026 - "GET /api/query/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61028 - "GET /api/query/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61030 - "GET /api/query/dashboard HTTP/1.1" 200 OK
+INFO:     192.168.0.202:63602 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:51767 - "GET /api/query/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51769 - "GET /api/query/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54950 - "GET /api/query/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54952 - "GET /api/query/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52815 - "GET /api/query/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52817 - "GET /api/query/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62484 - "GET /api/query/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62486 - "GET /api/query/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52681 - "GET /api/query/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52683 - "GET /api/query/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62111 - "POST /api/olap/slice HTTP/1.1" 200 OK
