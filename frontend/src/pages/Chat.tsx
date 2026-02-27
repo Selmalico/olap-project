@@ -10,11 +10,22 @@ import { MessageSquare, Sparkles, Loader2, AlertCircle, Lightbulb, TrendingUp, B
 const STARTER_QUESTIONS = [
   'Compare 2023 vs 2024 revenue by region',
   'Show top 5 countries by profit margin',
-  'Drill down Q4 2024 by month for Electronics',
-  'What are the most profitable product categories?',
   'Show YoY growth by category',
+  'Show month-over-month revenue trend for 2024',
+  'How many transactions were made in Q4 2023?',
+  'What is the total revenue in 2024?',
+  'How many orders were placed in Europe in 2023?',
+  'What is the average profit margin by category?',
+  'Drill down from year to quarter',
+  'Roll up from month to year level',
   'Pivot revenue by region and year',
-  'Detect any unusual patterns in 2024 sales data',
+  'What is the revenue share by region?',
+  'Slice data for Electronics in 2024',
+  'Dice: Electronics in Europe 2024',
+  'Drill through to raw transactions for 2024',
+  'Show YTD cumulative revenue for 2024',
+  'Show 3-month rolling average for revenue',
+  'Which customer segment is most profitable?',
 ];
 
 export default function Chat() {
@@ -37,7 +48,7 @@ export default function Chat() {
           </div>
           <div>
             <h1 className="text-lg font-bold text-slate-800">OLAP BI Assistant</h1>
-            <p className="text-xs text-slate-500">Multi-agent analytics · Slice, Dice, Drill, Pivot, YoY, MoM</p>
+            <p className="text-xs text-slate-500">Multi-agent analytics · Slice, Dice, Drill-Down/Up/Through, Pivot, YoY, MoM, YTD, Rolling Avg</p>
           </div>
         </div>
         <button
@@ -140,23 +151,24 @@ export default function Chat() {
 
                   {/* Fallback: raw result data (e.g. from orchestrator) */}
                   {!msg.reports?.length && msg.results?.length > 0 && (
-                    <div className="space-y-4 pt-2">
+                    <div className="space-y-6 pt-2 border-t border-slate-100">
                       {msg.results.map((result: any, i: number) => {
                         const rows = result.rows_list ?? result.rows;
                         const cols = result.columns_list ?? result.columns;
                         if (!rows?.length) return null;
-                        const chartResult = msg.results?.find((r: any) => r.chart_config);
+                        const opLabel = (result.operation || result._tool || '').replace(/_/g, ' ');
                         return (
-                          <div key={i} className="space-y-3">
-                            {result.operation && (
-                              <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
-                                {result.operation.replace(/_/g, ' ')}
-                              </p>
+                          <section key={i} className="space-y-3">
+                            {opLabel && (
+                              <h3 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                                <Sparkles className="w-4 h-4 text-amber-500" />
+                                {opLabel.replace(/\b\w/g, (c: string) => c.toUpperCase())}
+                              </h3>
+                            )}
+                            {result.chart_config && (
+                              <ChartPanel data={rows} config={result.chart_config} />
                             )}
                             <DataTable columns={cols} rows={rows} totalsRow={result.totals_row} light />
-                            {chartResult?.chart_config && (
-                              <ChartPanel data={rows} config={chartResult.chart_config} />
-                            )}
                             {result.anomalies?.length > 0 && (
                               <div className="space-y-1.5">
                                 {result.anomalies.map((a: string, j: number) => (
@@ -170,7 +182,7 @@ export default function Chat() {
                                 ))}
                               </div>
                             )}
-                          </div>
+                          </section>
                         );
                       })}
                     </div>

@@ -229,6 +229,50 @@ TOOLS = [
             },
         },
     },
+    {
+        "type": "function",
+        "function": {
+            "name": "ytd_revenue",
+            "description": "Year-to-date (YTD) cumulative revenue for a given year. Shows running total by month.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "year": {"type": "integer", "default": 2024},
+                    "measure": {"type": "string", "default": "revenue"},
+                    "group_by": {"type": "string"},
+                },
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "rolling_avg",
+            "description": "Calculate a rolling N-month moving average for a measure (time intelligence).",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "measure": {"type": "string", "default": "revenue"},
+                    "window": {"type": "integer", "default": 3},
+                    "filters": {"type": "object"},
+                },
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "drill_through",
+            "description": "Drill through to raw transaction records from the fact table.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "filters": {"type": "object"},
+                    "limit": {"type": "integer", "default": 50},
+                },
+            },
+        },
+    },
 ]
 
 SYSTEM_PROMPT = """You are an expert OLAP analyst for a Global Retail Sales data warehouse.
@@ -272,6 +316,14 @@ def _dispatch(name: str, args: dict) -> dict[str, Any]:
         return _kpi.compare_periods(**args)
     if name == "revenue_share":
         return _kpi.revenue_share(**args)
+    if name == "ytd_revenue":
+        return _kpi.ytd_revenue(**args)
+    if name == "rolling_avg":
+        return _kpi.rolling_avg(**args)
+    if name == "aggregate":
+        return _kpi.aggregate(**args)
+    if name == "drill_through":
+        return _nav.drill_through(**args)
     return {"error": f"Unknown tool: {name}"}
 
 
@@ -349,6 +401,35 @@ def _keyword_fallback(query: str) -> list[dict[str, Any]]:
                 break
         results.append(_kpi.revenue_share(group_by=group))
 
+    elif "ytd" in q or "year to date" in q or "year-to-date" in q or "cumulative" in q:
+        years = [y for y in [2022, 2023, 2024] if str(y) in q]
+        year = years[0] if years else 2024
+        measure = "revenue"
+        for m in ["profit", "quantity", "cost"]:
+            if m in q:
+                measure = m
+                break
+        results.append(_kpi.ytd_revenue(year=year, measure=measure))
+
+    elif "rolling" in q or "moving average" in q:
+        import re as _re2
+        m2 = _re2.search(r"\b(\d+).?month", q, _re2.I)
+        window = int(m2.group(1)) if m2 else 3
+        results.append(_kpi.rolling_avg(window=window))
+
+    elif any(word in q for word in ["drill through", "drill-through", "raw records", "raw data", "individual records", "detailed records", "show transactions"]):
+        filters = {}
+        for y in [2022, 2023, 2024]:
+            if str(y) in q:
+                filters["year"] = y
+        for region in ["north america", "europe", "asia pacific", "latin america"]:
+            if region in q:
+                filters["region"] = region.title()
+        for cat in ["electronics", "furniture", "office supplies", "clothing"]:
+            if cat in q:
+                filters["category"] = cat.title()
+        results.append(_nav.drill_through(filters=filters, limit=50))
+
     elif "pivot" in q:
         results.append(_cube.pivot(rows="region", columns="year", values="revenue"))
 
@@ -367,6 +448,55 @@ def _keyword_fallback(query: str) -> list[dict[str, Any]]:
             results.append(_cube.dice(filters=filters))
         else:
             results.append(_cube.slice("year", 2024))
+
+    elif any(word in q for word in ["how many", "count", "number of", "transactions", "orders", "how much", "what is", "what are", "show", "total", "sum"]):
+        # Build filters from query
+        filters = {}
+        for y in [2022, 2023, 2024]:
+            if str(y) in q:
+                filters["year"] = y
+        import re as _re3
+        qt = _re3.search(r"\bq([1-4])\b", q)
+        if qt:
+            filters["quarter"] = int(qt.group(1))
+        for region in ["north america", "europe", "asia pacific", "latin america"]:
+            if region in q:
+                filters["region"] = region.title()
+        for cat in ["electronics", "furniture", "office supplies", "clothing"]:
+            if cat in q:
+                filters["category"] = cat.title()
+        for seg in ["consumer", "corporate", "home office", "small business"]:
+            if seg in q:
+                filters["customer_segment"] = seg.title()
+
+        # Detect if it's a count/transaction query
+        is_count = any(w in q for w in ["how many", "count", "number of", "transactions", "orders", "sales made"])
+        # Detect grouping dimension
+        group = None
+        for dim in ["category", "subcategory", "country", "region", "customer_segment", "quarter", "month", "year"]:
+            if dim.replace("_", " ") in q and dim not in filters:
+                group = dim
+                break
+        measure = "revenue"
+        for m in ["profit", "quantity", "cost", "profit_margin"]:
+            if m.replace("_", " ") in q or m in q:
+                measure = m
+                break
+
+        if is_count:
+            # Use aggregate with COUNT
+            results.append(_kpi.aggregate(
+                measures=["revenue"],
+                functions=["COUNT", "SUM"],
+                group_by=group,
+                filters=filters,
+            ))
+        elif group and group not in ("year", "quarter", "month"):
+            results.append(_kpi.top_n(measure=measure, n=10, group_by=group, filters=filters))
+        elif group in ("year", "quarter", "month"):
+            results.append(_kpi.aggregate(measures=[measure], functions=["SUM"], group_by=group, filters=filters))
+        else:
+            results.append(_kpi.aggregate(measures=[measure], functions=["SUM", "COUNT"], filters=filters))
 
     else:
         results.append(_kpi.top_n(measure="revenue", n=5, group_by="region"))
@@ -390,7 +520,32 @@ class PlannerAgent:
         if hf_token:
             try:
                 from huggingface_hub import InferenceClient
-                self._hf_client = InferenceClient(model=self._model, token=hf_token)
+                import requests
+                from requests.adapters import HTTPAdapter
+                from urllib3.util.retry import Retry
+
+                # Configure retries for robust connection
+                retry_strategy = Retry(
+                    total=3,
+                    backoff_factor=1,
+                    status_forcelist=[429, 500, 502, 503, 504],
+                    allowed_methods=["POST", "GET"]
+                )
+                adapter = HTTPAdapter(max_retries=retry_strategy)
+                session = requests.Session()
+                session.mount("https://", adapter)
+                session.mount("http://", adapter)
+
+                self._hf_client = InferenceClient(
+                    model=self._model, 
+                    token=hf_token,
+                    headers={"X-Wait-For-Model": "true"}
+                )
+                # Note: Newer versions of huggingface_hub use httpx or allow passing a session
+                # If using requests-based version:
+                if hasattr(self._hf_client, "session"):
+                    self._hf_client.session = session
+                
                 self._provider = "huggingface"
                 logger.info(f"Hugging Face LLM enabled ({self._model})")
             except Exception as e:
@@ -400,33 +555,52 @@ class PlannerAgent:
             logger.info("LLM disabled: HUGGINGFACE_TOKEN not found in backend/.env")
 
     def _run_llm(self, query: str, history=None) -> list:
-        """Use Hugging Face Inference API for tool calling."""
+        """Use Hugging Face Inference API for tool calling with retries."""
+        import time
         messages = [{"role": "system", "content": SYSTEM_PROMPT}]
         for h in (history or []):
             messages.append(h)
         messages.append({"role": "user", "content": query})
 
-        # HF Inference Client supports tool use for Qwen 2.5
-        response = self._hf_client.chat_completion(
-            messages=messages,
-            tools=TOOLS,
-            tool_choice="auto",
-            max_tokens=500,
-        )
+        max_retries = 3
+        retry_delay = 1
+        last_exception = None
 
-        message = response.choices[0].message
-        if not message.tool_calls:
-            return [{"operation": "message", "text": message.content or "No result.", "rows": []}]
+        for attempt in range(max_retries):
+            try:
+                # HF Inference Client supports tool use for Qwen 2.5
+                response = self._hf_client.chat_completion(
+                    messages=messages,
+                    tools=TOOLS,
+                    tool_choice="auto",
+                    max_tokens=500,
+                )
 
-        results: list[dict[str, Any]] = []
-        for tc in message.tool_calls:
-            name = tc.function.name
-            args = tc.function.arguments if isinstance(tc.function.arguments, dict) else json.loads(tc.function.arguments)
-            result = _dispatch(name, args)
-            result["_tool"] = name
-            result["_args"] = args
-            results.append(result)
-        return results
+                message = response.choices[0].message
+                if not message.tool_calls:
+                    return [{"operation": "message", "text": message.content or "No result.", "rows": []}]
+
+                results: list[dict[str, Any]] = []
+                for tc in message.tool_calls:
+                    name = tc.function.name
+                    args = tc.function.arguments if isinstance(tc.function.arguments, dict) else json.loads(tc.function.arguments)
+                    result = _dispatch(name, args)
+                    result["_tool"] = name
+                    result["_args"] = args
+                    results.append(result)
+                return results
+            except Exception as e:
+                last_exception = e
+                # Only retry on connection-related errors
+                err_str = str(e).lower()
+                if any(msg in err_str for msg in ["connection", "timeout", "aborted", "reset", "10054"]):
+                    logger.warning(f"HF attempt {attempt+1} failed: {e}. Retrying in {retry_delay}s...")
+                    time.sleep(retry_delay)
+                    retry_delay *= 2
+                else:
+                    raise e
+        
+        raise last_exception if last_exception else Exception("HF call failed after retries")
 
     def _execute_step(self, step: dict, last_result: dict | None) -> dict:
         """Execute a single AgentSelector step, returning its result."""
@@ -521,6 +695,20 @@ class PlannerAgent:
         all_highlights = [h for s in summaries for h in s.get("highlights", [])]
         all_recommendations = [r for s in summaries for r in s.get("recommendations", [])]
 
+        # Build agent names from results
+        agents_used = []
+        for res in agent_results:
+            tool = res.get("_tool", "") or res.get("_step_label", "")
+            if tool:
+                agents_used.append(tool)
+            else:
+                op = res.get("operation", "")
+                if op:
+                    agents_used.append(op)
+
+        # Generate follow-up questions based on operations performed
+        follow_up_questions = self._generate_follow_ups(agent_results, user_query)
+
         return {
             "query": user_query,
             "results": agent_results,
@@ -530,7 +718,50 @@ class PlannerAgent:
                 "highlights": all_highlights,
                 "recommendations": all_recommendations,
             },
+            "agents_used": agents_used,
+            "follow_up_questions": follow_up_questions,
             "llm_used": using_llm,
             "provider": self._provider if using_llm else None,
             "llm_fallback_reason": llm_fallback_reason,
         }
+
+    def _generate_follow_ups(self, results: list[dict], query: str) -> list[str]:
+        """Generate context-aware follow-up suggestions based on what was computed."""
+        ops = [r.get("operation", r.get("_tool", "")) for r in results if not r.get("error")]
+        q = query.lower()
+        suggestions = []
+
+        op_follow_ups = {
+            "yoy_growth":      ["Show month-over-month trend for 2024", "Which category had the best YoY growth?", "Compare Q3 vs Q4 this year"],
+            "mom_change":      ["Show YoY growth for the same metric", "Which region had the biggest monthly swing?", "Show YTD cumulative revenue for 2024"],
+            "compare_periods": ["Show profit margins for each region", "Drill down into the best quarter", "Show YoY growth by category"],
+            "top_n":           ["Show profit margins for these groups", "Compare with last year's rankings", "Drill into the top performer"],
+            "profit_margins":  ["Show revenue for the same groups", "Which subcategory has the lowest margin?", "Compare margins YoY"],
+            "revenue_share":   ["Show absolute revenue for each group", "Compare revenue share 2023 vs 2024", "Drill down to country level"],
+            "drill_down":      ["Roll up to the higher level", "Show profit margins at this level", "Which sub-group has the highest profit?"],
+            "roll_up":         ["Drill down for more detail", "Compare year-over-year at this level", "Show revenue share"],
+            "drill_through":   ["Summarise these by category", "Show top 5 by revenue", "Filter to a specific region"],
+            "slice":           ["Add more filters (dice operation)", "Show YoY growth for this slice", "Which sub-group performs best?"],
+            "dice":            ["Show profit margins for this combination", "Drill down within this view", "Compare with a different period"],
+            "pivot":           ["Show the same pivot for profit margin", "Which cell has the highest value?", "Compare this pivot with 2023"],
+            "ytd_revenue":     ["Compare YTD vs same period last year", "Show month-over-month within this year", "Which category drives the most YTD revenue?"],
+            "rolling_avg":     ["Show raw monthly data alongside this", "Which month had the biggest deviation from the trend?", "Extend to a 6-month rolling average"],
+            "aggregate":       ["Break this down by category", "Break this down by region", "Show YoY growth for the same filters"],
+        }
+
+        for op in ops:
+            if op in op_follow_ups and len(suggestions) < 3:
+                for q_sug in op_follow_ups[op]:
+                    if q_sug not in suggestions:
+                        suggestions.append(q_sug)
+                        if len(suggestions) >= 3:
+                            break
+
+        if not suggestions:
+            suggestions = [
+                "Show revenue breakdown by region",
+                "Compare 2023 vs 2024 performance",
+                "Which product category has the highest profit margin?",
+            ]
+
+        return suggestions[:3]

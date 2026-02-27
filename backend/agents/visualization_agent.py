@@ -90,16 +90,17 @@ class VisualizationAgent:
     ) -> tuple[str, list[dict]]:
         """Return (chart_type, y_axes list)."""
         # Time-series operations → Line
-        if operation in ("yoy_growth", "mom_change") or any(
+        if operation in ("yoy_growth", "mom_change", "ytd_revenue", "rolling_avg") or any(
             c in all_cols for c in ("month", "month_name", "quarter")
         ):
             measure_cols = [c for c in numeric_cols
-                            if c in ("metric", "current", "total_revenue",
-                                     "abs_change", "pct_change")]
+                            if c in ("metric", "current", "total_revenue", "monthly_value",
+                                     "abs_change", "pct_change") or
+                               c.startswith("ytd_") or c.startswith("rolling_") or c.startswith("monthly_")]
             if not measure_cols:
-                measure_cols = numeric_cols[:2]
+                measure_cols = numeric_cols[:3]
             y_axes = [
-                {"field": c, "color": COLORS[i % len(COLORS)], "type": "line", "label": c}
+                {"field": c, "color": COLORS[i % len(COLORS)], "type": "line", "label": c.replace("_", " ").title()}
                 for i, c in enumerate(measure_cols)
             ]
             return "LineChart", y_axes
@@ -155,6 +156,9 @@ class VisualizationAgent:
             "top_n": f"Top {data.get('n', '')} by {data.get('measure', '')}",
             "compare_periods": "Period Comparison",
             "revenue_share": "Revenue Share",
+            "drill_through": "Transaction Detail",
+            "ytd_revenue": f"YTD {data.get('measure', 'Revenue').title()} — {data.get('year', '')}",
+            "rolling_avg": f"Rolling {data.get('window', 3)}-Month Average",
         }
         return label_map.get(operation, operation.replace("_", " ").title())
 

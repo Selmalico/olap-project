@@ -11,6 +11,73 @@ _repo = SalesRepository()
 class KPICalculatorAgent:
     """Calculates business KPIs from the star-schema data warehouse."""
 
+    def aggregate(
+        self,
+        measures: list[str] | None = None,
+        functions: list[str] | None = None,
+        group_by: str | None = None,
+        filters: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """
+        Flexible aggregation: SUM, AVG, COUNT across any dimension with optional filters.
+        Handles 'how many orders/transactions', 'total revenue by quarter', etc.
+        """
+        from database.repository import _where, BASE_JOIN, _col, _measure_expr, VALID_MEASURES
+        from database.connection import get_db
+
+        filters = filters or {}
+        funcs = functions or ["SUM"]
+        measure_list = measures or ["revenue"]
+
+        # Build SELECT parts
+        select_parts = []
+        if group_by and group_by in VALID_DIMENSIONS:
+            select_parts.append(f"{_col(group_by)} AS group_dim")
+
+        for func in funcs:
+            func = func.upper()
+            if func == "COUNT":
+                select_parts.append("COUNT(*) AS order_count")
+            elif func == "SUM":
+                for m in measure_list:
+                    if m in VALID_MEASURES:
+                        select_parts.append(f"SUM(fs.{m}) AS total_{m}")
+            elif func == "AVG":
+                for m in measure_list:
+                    if m in VALID_MEASURES:
+                        expr = "AVG(fs.profit_margin)" if m == "profit_margin" else f"AVG(fs.{m})"
+                        select_parts.append(f"{expr} AS avg_{m}")
+
+        # Always include order count for informational purposes
+        if "COUNT(*) AS order_count" not in select_parts:
+            select_parts.append("COUNT(*) AS order_count")
+
+        if not select_parts:
+            select_parts = ["COUNT(*) AS order_count", "SUM(fs.revenue) AS total_revenue"]
+
+        where, params = _where(filters)
+        group_clause = f"GROUP BY {_col(group_by)}" if group_by and group_by in VALID_DIMENSIONS else ""
+        order_clause = f"ORDER BY {_col(group_by)}" if group_by and group_by in VALID_DIMENSIONS else ""
+
+        sql = f"""
+        SELECT {", ".join(select_parts)}
+        {BASE_JOIN}
+        {where}
+        {group_clause}
+        {order_clause}
+        """
+        df = get_db().execute(sql, params).df()
+        return {
+            "operation": "aggregate",
+            "measures": measure_list,
+            "functions": funcs,
+            "group_by": group_by,
+            "filters": filters,
+            "columns": list(df.columns),
+            "rows": df.round(2).to_dict(orient="records"),
+            "row_count": len(df),
+        }
+
     def yoy_growth(
         self,
         measure: str = "revenue",
@@ -152,4 +219,80 @@ class KPICalculatorAgent:
         return {
             "operation": "revenue_share", "group_by": group_by,
             "columns": list(df.columns), "rows": df.round(2).to_dict(orient="records"),
+        }
+
+    def ytd_revenue(
+        self,
+        year: int = 2024,
+        measure: str = "revenue",
+        group_by: str | None = None,
+    ) -> dict[str, Any]:
+        """Year-to-date cumulative revenue for a given year, optionally by dimension."""
+        from database.repository import _where, BASE_JOIN, _col, _measure_expr
+        from database.connection import get_db
+        measure_col = _measure_expr(measure)
+        dim_select = f", {_col(group_by)} AS group_dim" if group_by else ""
+        dim_group = f", {_col(group_by)}" if group_by else ""
+        # Use a subquery to avoid mixing window functions with GROUP BY aggregates
+        sql = f"""
+        WITH monthly AS (
+            SELECT dd.month, dd.month_name {dim_select},
+                   {measure_col} AS monthly_{measure}
+            {BASE_JOIN}
+            WHERE dd.year = ?
+            GROUP BY dd.month, dd.month_name {dim_group}
+        )
+        SELECT *,
+               SUM(monthly_{measure}) OVER (
+                   {"PARTITION BY group_dim " if group_by else ""}ORDER BY month
+                   ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+               ) AS ytd_{measure}
+        FROM monthly
+        ORDER BY month {", group_dim" if group_by else ""}
+        """
+        df = get_db().execute(sql, [year]).df()
+        return {
+            "operation": "ytd_revenue",
+            "measure": measure,
+            "year": year,
+            "group_by": group_by,
+            "columns": list(df.columns),
+            "rows": df.round(2).to_dict(orient="records"),
+        }
+
+    def rolling_avg(
+        self,
+        measure: str = "revenue",
+        window: int = 3,
+        filters: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """Rolling N-month average for a measure (time intelligence)."""
+        from database.repository import _where, BASE_JOIN, _measure_expr
+        from database.connection import get_db
+        measure_col = _measure_expr(measure)
+        where, params = _where(filters or {})
+        # Use subquery to avoid mixing window functions with GROUP BY aggregates
+        sql = f"""
+        WITH monthly AS (
+            SELECT dd.year, dd.month, dd.month_name,
+                   {measure_col} AS monthly_value
+            {BASE_JOIN}
+            {where}
+            GROUP BY dd.year, dd.month, dd.month_name
+        )
+        SELECT *,
+               AVG(monthly_value) OVER (
+                   ORDER BY year, month
+                   ROWS BETWEEN {window - 1} PRECEDING AND CURRENT ROW
+               ) AS rolling_{window}m_avg
+        FROM monthly
+        ORDER BY year, month
+        """
+        df = get_db().execute(sql, params).df()
+        return {
+            "operation": "rolling_avg",
+            "measure": measure,
+            "window": window,
+            "columns": list(df.columns),
+            "rows": df.round(2).to_dict(orient="records"),
         }

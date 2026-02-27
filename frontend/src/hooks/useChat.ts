@@ -39,16 +39,31 @@ export function useChat() {
       const response = await queryOLAP(query, history, conversationId);
       setConversationId(response.conversation_id);
       const operations = (response.results || [])
-        .map((r: any) => r.operation)
-        .filter(Boolean);
+        .map((r: any) => r.operation || r._tool)
+        .filter(Boolean)
+        .filter((op: string, idx: number, arr: string[]) => arr.indexOf(op) === idx); // deduplicate
       setActiveAgents(response.agents_used || operations);
       setLastResults(response);
 
       const summary = response.summary || {};
+      // Build a meaningful content string from available data
+      let contentText = summary.text || '';
+      if (!contentText && response.executive_summary) {
+        contentText = response.executive_summary;
+      }
+      if (!contentText) {
+        // Generate a summary from results
+        const resultCount = (response.results || []).filter((r: any) => !r.error && r.rows?.length).length;
+        const agentList = (response.agents_used || operations).join(', ');
+        contentText = resultCount > 0
+          ? `Analysis complete — ${resultCount} result set(s) returned using: ${agentList || 'multi-agent pipeline'}.`
+          : 'Query processed. See the results below.';
+      }
+
       const assistantMsg: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: summary.text || 'Analysis complete. See results below.',
+        content: contentText,
         results: response.results,
         reports: response.reports,
         summary: {

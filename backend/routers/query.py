@@ -132,10 +132,27 @@ async def natural_language_query(body: QueryRequest) -> Response:
             except Exception:
                 pass
 
-        # Save conversation turns
+        # Build executive summary text for conversation storage
         summary_text = data.get("summary", {}).get("text", "")
+        # Also try to get it from the results' executive_summary fields
+        if not summary_text:
+            for result in results:
+                es = result.get("executive_summary", "")
+                if es:
+                    summary_text = es
+                    break
+        if not summary_text:
+            # Generate a basic summary from what we have
+            result_count = sum(1 for r in results if r.get("rows") and not r.get("error"))
+            ops = [r.get("operation", "") for r in results if r.get("operation")]
+            op_str = ", ".join(set(ops)) if ops else "analysis"
+            summary_text = f"Completed {op_str} — {result_count} result set(s) returned."
+
+        # Inject executive summary back into data for frontend
+        data["executive_summary"] = summary_text
+
         add_turn(conv_id, "user", body.query)
-        add_turn(conv_id, "assistant", summary_text or "Analysis complete.")
+        add_turn(conv_id, "assistant", summary_text)
 
         # Store top dimension value for follow-up context
         if results:

@@ -214,6 +214,19 @@ class ReportGeneratorAgent:
                         highlights.append(f"Decline: {_pct_fmt(worst['pct_change'])} in {worst_label}")
                         recommendations.append("Investigate the declining segment and consider targeted interventions.")
 
+        elif operation == "aggregate":
+            funcs = data.get("functions", ["SUM"])
+            filters = data.get("filters", {})
+            filter_str = ", ".join(f"{k}={v}" for k, v in filters.items()) if filters else "all data"
+            if "order_count" in df.columns:
+                total_count = int(df["order_count"].sum())
+                summary_lines.append(f"Aggregate ({filter_str}): {total_count:,} transactions.")
+                highlights.append(f"Transaction count: {total_count:,}")
+            if "total_revenue" in df.columns:
+                total_rev = df["total_revenue"].sum()
+                highlights.append(f"Total revenue: {_money_fmt(total_rev)}")
+            recommendations.append("Drill down by category, region, or time period for more granular analysis.")
+
         elif operation in ("slice", "dice"):
             if "total_revenue" in df.columns:
                 total = df["total_revenue"].sum()
@@ -253,11 +266,38 @@ class ReportGeneratorAgent:
                     highlights.append("Performance declined compared to the prior period.")
                     recommendations.append("Examine contributing factors to the decline and prioritise recovery actions.")
 
+        elif operation == "drill_through":
+            summary_lines.append(f"Drill-through returned {len(rows)} individual transaction record(s).")
+            if "revenue" in df.columns:
+                total = df["revenue"].sum()
+                highlights.append(f"Total revenue across shown records: {_money_fmt(total)}")
+            if "category" in df.columns and "revenue" in df.columns:
+                top_cat = df.groupby("category")["revenue"].sum().idxmax()
+                highlights.append(f"Top category in this view: {top_cat}")
+            recommendations.append("Review individual transactions to identify specific opportunities or issues.")
+
         elif operation in ("drill_down", "roll_up"):
             to_level = data.get("to_level", "level")
             summary_lines.append(f"Drill {'down' if operation == 'drill_down' else 'up'} to {to_level} level.")
             if "total_revenue" in df.columns:
                 highlights.append(f"Total revenue: {_money_fmt(df['total_revenue'].sum())}")
+                if len(df) > 0:
+                    top_row = df.loc[df["total_revenue"].idxmax()]
+                    label_cols = [c for c in df.columns if c not in ("total_revenue", "total_profit", "order_count")]
+                    if label_cols:
+                        highlights.append(f"Top group: {top_row[label_cols[-1]]} ({_money_fmt(top_row['total_revenue'])})")
+
+        elif operation == "pivot":
+            summary_lines.append(f"Pivot table: {data.get('rows', 'rows')} × {data.get('columns', 'columns')}.")
+
+        elif operation == "revenue_share":
+            if "revenue_share_pct" in df.columns or "share_pct" in df.columns:
+                share_col = "revenue_share_pct" if "revenue_share_pct" in df.columns else "share_pct"
+                top = df.loc[df[share_col].idxmax()] if len(df) > 0 else None
+                if top is not None:
+                    group_col = [c for c in df.columns if c not in (share_col, "total_revenue")][0] if len(df.columns) > 1 else "group"
+                    highlights.append(f"Largest share: {top.get(group_col, top.iloc[0])} ({_pct_fmt(top[share_col])})")
+            recommendations.append("Consider rebalancing portfolio to reduce concentration risk.")
 
         heuristic_summary = {
             "summary": " ".join(summary_lines),
@@ -268,43 +308,54 @@ class ReportGeneratorAgent:
 
         # Use Hugging Face for a better summary if available
         if self._hf_client:
-            try:
-                prompt = f"""
-                You are a senior Business Intelligence analyst. 
-                Generate a concise executive summary based on the following OLAP data result.
-                
-                Data (JSON): {json.dumps(data, default=str)}
-                Heuristic Baseline: {heuristic_summary['summary']}
-                
-                Return a JSON object with:
-                - "summary": A 1-2 sentence overview.
-                - "highlights": A list of 2-3 key insights.
-                - "recommendations": A list of 1-2 suggested actions.
-                """
-                
-                response = self._hf_client.chat_completion(
-                    messages=[{"role": "user", "content": prompt}],
-                    max_tokens=500,
-                )
-                
-                text = response.choices[0].message.content.strip()
-                # Simple extraction of JSON if model wraps it in markdown
-                if "```json" in text:
-                    text = text.split("```json")[1].split("```")[0].strip()
-                elif "```" in text:
-                    text = text.split("```")[1].split("```")[0].strip()
-                
-                gemini_data = json.loads(text)
-                return {
-                    "summary": gemini_data.get("summary", heuristic_summary["summary"]),
-                    "highlights": gemini_data.get("highlights", heuristic_summary["highlights"]),
-                    "recommendations": gemini_data.get("recommendations", heuristic_summary["recommendations"]),
-                    "operation": operation,
-                    "generated_by": "huggingface"
-                }
-            except Exception as e:
-                logger.warning("Hugging Face summary generation failed: %s", e)
-                return heuristic_summary
+            import time
+            max_retries = 2
+            retry_delay = 1
+            
+            for attempt in range(max_retries + 1):
+                try:
+                    prompt = f"""
+                    You are a senior Business Intelligence analyst. 
+                    Generate a concise executive summary based on the following OLAP data result.
+                    
+                    Data (JSON): {json.dumps(data, default=str)}
+                    Heuristic Baseline: {heuristic_summary['summary']}
+                    
+                    Return a JSON object with:
+                    - "summary": A 1-2 sentence overview.
+                    - "highlights": A list of 2-3 key insights.
+                    - "recommendations": A list of 1-2 suggested actions.
+                    """
+                    
+                    response = self._hf_client.chat_completion(
+                        messages=[{"role": "user", "content": prompt}],
+                        max_tokens=500,
+                    )
+                    
+                    text = response.choices[0].message.content.strip()
+                    # Simple extraction of JSON if model wraps it in markdown
+                    if "```json" in text:
+                        text = text.split("```json")[1].split("```")[0].strip()
+                    elif "```" in text:
+                        text = text.split("```")[1].split("```")[0].strip()
+                    
+                    gemini_data = json.loads(text)
+                    return {
+                        "summary": gemini_data.get("summary", heuristic_summary["summary"]),
+                        "highlights": gemini_data.get("highlights", heuristic_summary["highlights"]),
+                        "recommendations": gemini_data.get("recommendations", heuristic_summary["recommendations"]),
+                        "operation": operation,
+                        "generated_by": "huggingface"
+                    }
+                except Exception as e:
+                    err_str = str(e).lower()
+                    if attempt < max_retries and any(msg in err_str for msg in ["connection", "timeout", "aborted", "reset", "10054"]):
+                        logger.warning(f"ReportGenerator HF attempt {attempt+1} failed: {e}. Retrying...")
+                        time.sleep(retry_delay)
+                        retry_delay *= 2
+                        continue
+                    logger.warning("Hugging Face summary generation failed: %s", e)
+                    return heuristic_summary
 
         return heuristic_summary
 
@@ -356,5 +407,9 @@ class ReportGeneratorAgent:
             "top_n": f"Top {data.get('n', '')} by {data.get('measure', '')}",
             "compare_periods": "Period Comparison",
             "revenue_share": "Revenue Share Analysis",
+            "drill_through": "Drill-Through: Raw Transactions",
+            "ytd_revenue": f"YTD {data.get('measure', 'Revenue').title()} — {data.get('year', '')}",
+            "rolling_avg": f"Rolling {data.get('window', 3)}-Month Average",
+            "aggregate": f"Aggregate Analysis — {', '.join(data.get('functions', ['SUM']))}",
         }
         return label_map.get(op, op.replace("_", " ").title())

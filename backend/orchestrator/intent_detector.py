@@ -38,6 +38,9 @@ INTENT_PIVOT          = "pivot"
 INTENT_AGGREGATE      = "aggregate"
 INTENT_RANK_ALL       = "rank_all"
 INTENT_DESCRIBE       = "describe_hierarchy"
+INTENT_DRILL_THROUGH  = "drill_through"
+INTENT_YTD            = "ytd_revenue"
+INTENT_ROLLING        = "rolling_avg"
 INTENT_UNKNOWN        = "top_n"   # safe default
 
 # ── Domain vocabulary ────────────────────────────────────────────────────────
@@ -388,23 +391,73 @@ class IntentDetector:
                     return INTENT_DESCRIBE, 0.85, {"hierarchy": h}
             return INTENT_DESCRIBE, 0.75, {"hierarchy": "time"}
 
-        # ── Aggregate (explicit SUM/AVG/COUNT) ───────────────────────────────
-        if re.search(r"\bsum\b|\baverage\b|\bavg\b|\bcount\b|\btotal\b|\bhow\s*many\b|\bhow\s*much\b", q):
+        # ── YTD (Year-to-date) ────────────────────────────────────────────────
+        if re.search(r"\bytd\b|\byear.?to.?date\b|\bcumulative\b|\brunning\s+total\b|\bso\s+far\s+this\s+year\b", q):
+            years = _extract_years(q)
+            return INTENT_YTD, 0.90, {
+                "year": years[0] if years else 2024,
+                "measure": _extract_measure(q),
+                "group_by": _extract_dimension(q),
+            }
+
+        # ── Rolling average / window ──────────────────────────────────────────
+        if re.search(r"\brolling\b|\bmoving\s+average\b|\bma\s*\d+\b|\b\d+.month\s+average\b|\btrend\s+line\b", q):
+            m = re.search(r"\b(\d+).?month", q, re.I)
+            window = int(m.group(1)) if m else 3
+            return INTENT_ROLLING, 0.88, {
+                "measure": _extract_measure(q),
+                "window": window,
+                "filters": _extract_filters(q),
+            }
+
+        # ── Drill-through (raw transaction records) ──────────────────────────
+        if re.search(r"\bdrill.?through\b|\braw\s*(records?|data|transactions?)\b|\bindividual\s*(records?|transactions?|orders?)\b|\bdetailed?\s*(records?|transactions?|orders?)\b|\bshow\s*(all|individual|raw)\s*(records?|transactions?|orders?)\b", q):
+            return INTENT_DRILL_THROUGH, 0.92, {
+                "filters": _extract_filters(q),
+                "limit": 50,
+            }
+
+        # ── Count / transaction queries ("how many orders/transactions were made") ──
+        if re.search(r"\bhow\s*many\b|\bnumber\s+of\s+(orders?|transactions?|sales?|records?)\b|\bcount\s+(of\s+)?(orders?|transactions?|sales?|records?)\b|\b(orders?|transactions?|sales?)\s+(were|was|made|in|during)\b", q):
+            filters = _extract_filters(q)
+            dim = _extract_dimension(q)
+            # Only group if query explicitly says "by X"
+            group = None
+            if re.search(r"\bby\s+(region|country|category|subcategory|customer|segment|quarter|month|year)\b", q):
+                group = dim
+            return INTENT_AGGREGATE, 0.92, {
+                "measures":  ["revenue"],
+                "functions": ["COUNT", "SUM"],
+                "group_by":  group,
+                "filters":   filters,
+            }
+
+        # ── Aggregate (explicit SUM/AVG or general "show/what is revenue by X") ──
+        if re.search(r"\bsum\b|\baverage\b|\bavg\b|\btotal\b|\bhow\s*much\b|\bwhat\s+is\b|\bwhat\s+are\b|\bshow\s+(me\s+)?(the\s+)?(\w+\s+)?(revenue|profit|sales|cost|quantity)\b|\bby\s+(region|country|category|subcategory|customer|segment|year|quarter|month)\b", q):
+            dim = _extract_dimension(q)
+            filters = _extract_filters(q)
+            measure = _extract_measure(q)
+            # If there's a "by <dim>" pattern it's really a top_n / revenue query
+            if dim and dim not in ("year", "quarter", "month"):
+                return INTENT_TOP_N, 0.78, {
+                    "measure":  measure,
+                    "n":        10,
+                    "group_by": dim,
+                    "filters":  filters,
+                    "ascending": False,
+                }
             funcs = []
             if re.search(r"\bsum\b|\btotal\b", q):
                 funcs.append("SUM")
             if re.search(r"\baverage\b|\bavg\b|\bmean\b", q):
                 funcs.append("AVG")
-            if re.search(r"\bcount\b|\bhow\s*many\b", q):
-                funcs.append("COUNT")
             if not funcs:
                 funcs = ["SUM"]
-            dim = _extract_dimension(q)
             return INTENT_AGGREGATE, 0.82, {
-                "measures":  [_extract_measure(q)],
+                "measures":  [measure],
                 "functions": funcs,
                 "group_by":  dim,
-                "filters":   _extract_filters(q),
+                "filters":   filters,
             }
 
         # ── Default: top revenue by region ──────────────────────────────────
@@ -474,7 +527,8 @@ class IntentDetector:
                 r"\bbest\b|\bhighest\b|\btop\b|\bleading\b|\bidentif", q):
             secondary.append(INTENT_TOP_N)
 
-        if primary not in (INTENT_DRILL_DOWN, INTENT_ROLL_UP) and re.search(
+        # Don't add drill-down secondary for aggregate/count queries — "transactions" shouldn't trigger drill
+        if primary not in (INTENT_DRILL_DOWN, INTENT_ROLL_UP, INTENT_AGGREGATE, INTENT_DRILL_THROUGH) and re.search(
                 r"\bdrill\b|\bbreak\s*down\b|\bdetail\b", q):
             secondary.append(INTENT_DRILL_DOWN)
 

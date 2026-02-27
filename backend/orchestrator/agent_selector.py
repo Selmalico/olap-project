@@ -25,7 +25,7 @@ from .intent_detector import (
     INTENT_DRILL_DOWN, INTENT_ROLL_UP,
     INTENT_SLICE, INTENT_DICE, INTENT_PIVOT,
     INTENT_AGGREGATE, INTENT_RANK_ALL, INTENT_DESCRIBE,
-    INTENT_UNKNOWN,
+    INTENT_DRILL_THROUGH, INTENT_YTD, INTENT_ROLLING, INTENT_UNKNOWN,
 )
 
 
@@ -112,11 +112,18 @@ class AgentSelector:
         if intent == INTENT_MOM:
             return [_kpi("mom_change", params, "Month-over-month change")]
 
+        if intent == INTENT_YTD:
+            return [_kpi("ytd_revenue", params, f"Year-to-date {params.get('measure', 'revenue')} for {params.get('year', 2024)}")]
+
+        if intent == INTENT_ROLLING:
+            return [_kpi("rolling_avg", params, f"Rolling {params.get('window', 3)}-month average")]
+
         if intent == INTENT_TOP_N:
             return [_kpi("top_n", params, f"Top {params.get('n', 5)} by {params.get('group_by', 'country')}")]
 
         if intent == INTENT_RANK_ALL:
-            return [_kpi("rank_all", params, f"Full ranking by {params.get('group_by', 'country')}")]
+            # rank_all has no dedicated method; use top_n with large n
+            return [_kpi("top_n", {**params, "n": params.get("n", 20)}, f"Full ranking by {params.get('group_by', 'country')}")]
 
         if intent == INTENT_PROFIT_MARGINS:
             return [_kpi("profit_margins", params, "Profit margin analysis")]
@@ -125,7 +132,8 @@ class AgentSelector:
             return [_kpi("revenue_share", params, "Revenue share breakdown")]
 
         if intent == INTENT_AGGREGATE:
-            return [_kpi("aggregate", params, "Aggregate metrics")]
+            # Always call aggregate() — it handles COUNT, SUM, AVG with any filters/group_by
+            return [_kpi("aggregate", params, "Aggregate analysis")]
 
         if intent == INTENT_DRILL_DOWN:
             return [_nav("drill_down", params, f"Drill down: {params.get('from_level')} → {params.get('to_level')}")]
@@ -134,7 +142,16 @@ class AgentSelector:
             return [_nav("roll_up", params, f"Roll up: {params.get('from_level')} → {params.get('to_level')}")]
 
         if intent == INTENT_DESCRIBE:
-            return [_nav("describe_hierarchy", params, f"Hierarchy: {params.get('hierarchy')}")]
+            # Map hierarchy to a sensible drill_down overview (describe_hierarchy not a real method)
+            hierarchy = params.get("hierarchy", "time")
+            h_map = {"time": ("year", "quarter"), "geography": ("region", "country"), "product": ("category", "subcategory")}
+            from_level, to_level = h_map.get(hierarchy, ("year", "quarter"))
+            return [_nav("drill_down", {
+                "hierarchy": hierarchy, "from_level": from_level, "to_level": to_level, "filters": {},
+            }, f"Hierarchy overview: {hierarchy}")]
+
+        if intent == INTENT_DRILL_THROUGH:
+            return [_nav("drill_through", params, "Drill-through: raw transaction records")]
 
         if intent == INTENT_SLICE:
             return [_cube("slice", params, f"Slice: {params.get('dimension')} = {params.get('value')}")]

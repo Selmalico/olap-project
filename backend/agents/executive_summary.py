@@ -78,25 +78,38 @@ class ExecutiveSummaryAgent:
         heuristic = self._heuristic(data, anomalies or [])
 
         if self._hf_client:
-            try:
-                prompt = (
-                    "You are a senior BI analyst writing a 3-sentence executive summary. "
-                    "Sentence 1: what happened (key metric + direction + magnitude). "
-                    "Sentence 2: what drove it (top segment/region/product). "
-                    "Sentence 3: what to watch or do next (actionable). "
-                    "Use specific numbers. Return only the 3-sentence paragraph, no JSON.\n\n"
-                    f"Data (JSON): {json.dumps(data, default=str)[:2000]}\n"
-                    f"Anomalies: {anomalies or []}"
-                )
-                response = self._hf_client.chat_completion(
-                    messages=[{"role": "user", "content": prompt}],
-                    max_tokens=300,
-                )
-                text = response.choices[0].message.content.strip()
-                if text:
-                    return {"narrative": text}
-            except Exception as e:
-                logger.warning("ExecutiveSummary HF call failed: %s", e)
+            import time
+            max_retries = 2
+            retry_delay = 1
+            
+            for attempt in range(max_retries + 1):
+                try:
+                    prompt = (
+                        "You are a senior BI analyst writing a 3-sentence executive summary. "
+                        "Sentence 1: what happened (key metric + direction + magnitude). "
+                        "Sentence 2: what drove it (top segment/region/product). "
+                        "Sentence 3: what to watch or do next (actionable). "
+                        "Use specific numbers. Return only the 3-sentence paragraph, no JSON.\n\n"
+                        f"Data (JSON): {json.dumps(data, default=str)[:2000]}\n"
+                        f"Anomalies: {anomalies or []}"
+                    )
+                    response = self._hf_client.chat_completion(
+                        messages=[{"role": "user", "content": prompt}],
+                        max_tokens=300,
+                    )
+                    text = response.choices[0].message.content.strip()
+                    if text:
+                        return {"narrative": text}
+                    break # Exit loop if successful but empty
+                except Exception as e:
+                    err_str = str(e).lower()
+                    if attempt < max_retries and any(msg in err_str for msg in ["connection", "timeout", "aborted", "reset", "10054"]):
+                        logger.warning(f"ExecutiveSummary HF attempt {attempt+1} failed: {e}. Retrying...")
+                        time.sleep(retry_delay)
+                        retry_delay *= 2
+                        continue
+                    logger.warning("ExecutiveSummary HF call failed: %s", e)
+                    break
 
         return {"narrative": heuristic}
 
@@ -200,12 +213,83 @@ class ExecutiveSummaryAgent:
             )
         if operation == "revenue_share":
             top = rows[0] if rows else {}
+            share_val = top.get("revenue_share_pct") or top.get("share_pct")
+            group_val = top.get("group_dim") or top.get(list(top.keys())[0] if top else "segment", "the top segment")
             return (
-                f"Revenue share analysis shows {top.get('group_dim', 'the top segment')} "
-                f"accounts for {_fmt_pct(top.get('revenue_share_pct'))} of total revenue."
+                f"Revenue share analysis shows {group_val} "
+                f"accounts for {_fmt_pct(share_val)} of total revenue."
             )
-        # Generic fallback
-        return f"The analysis returned {len(rows)} data point(s) for the '{operation}' operation."
+        if operation == "aggregate":
+            funcs = data.get("functions", ["SUM"])
+            group = data.get("group_by")
+            filters = data.get("filters", {})
+            filter_str = ", ".join(f"{k}={v}" for k, v in filters.items()) if filters else "overall"
+            if "COUNT" in funcs and rows:
+                total_count = sum(int(r.get("order_count") or 0) for r in rows)
+                total_rev = sum(float(r.get("total_revenue") or 0) for r in rows)
+                group_str = f" grouped by {group}" if group else ""
+                return (
+                    f"For {filter_str}{group_str}: "
+                    f"{total_count:,} transactions with total revenue of {_fmt_money(total_rev)}."
+                )
+            if rows:
+                first_key = next((k for k in rows[0] if k.startswith("total_") or k.startswith("avg_")), None)
+                if first_key:
+                    total = sum(float(r.get(first_key) or 0) for r in rows)
+                    return f"Aggregate ({filter_str}): {first_key.replace('total_', '').replace('avg_', 'avg ')} = {_fmt_money(total)}."
+            return f"Aggregate analysis ({filter_str}) returned {len(rows)} result(s)."
+
+        if operation == "drill_through":
+            total_rev = sum(float(r.get("revenue") or 0) for r in rows if isinstance(r.get("revenue"), (int, float)))
+            return (
+                f"Drill-through retrieved {len(rows)} raw transaction records "
+                f"with combined revenue of {_fmt_money(total_rev)}."
+            )
+        if operation == "ytd_revenue":
+            measure = data.get("measure", "revenue")
+            year = data.get("year", "")
+            last = [r for r in rows if r.get(f"ytd_{measure}") is not None]
+            if last:
+                cumulative = float(last[-1].get(f"ytd_{measure}") or 0)
+                return (
+                    f"Year-to-date {measure} for {year} reached "
+                    f"{_fmt_money(cumulative)} through {last[-1].get('month_name', 'the latest month')}."
+                )
+            return f"YTD {measure} data for {year} returned {len(rows)} month(s)."
+
+        if operation == "rolling_avg":
+            measure = data.get("measure", "revenue")
+            window = data.get("window", 3)
+            if rows:
+                last_avg = float(rows[-1].get(f"rolling_{window}m_avg") or 0)
+                return (
+                    f"The {window}-month rolling average for {measure} is currently "
+                    f"{_fmt_money(last_avg)}."
+                )
+            return f"Rolling {window}-month average for {measure} — {len(rows)} period(s) analysed."
+
+        if operation == "pivot":
+            row_dim = data.get("rows", "rows")
+            col_dim = data.get("columns", "columns")
+            return (
+                f"Pivot matrix shows {row_dim} vs {col_dim} — "
+                f"{len(rows)} row(s) of data returned."
+            )
+        if operation in ("slice", "dice"):
+            total = sum(float(r.get("total_revenue") or r.get("revenue") or 0) for r in rows
+                        if isinstance(r.get("total_revenue") or r.get("revenue"), (int, float)))
+            return (
+                f"Filtered analysis ({operation}) returned {len(rows)} group(s) "
+                f"with total revenue of {_fmt_money(total)}."
+            )
+        # Generic fallback — still informative
+        if rows:
+            numeric_keys = [k for k, v in rows[0].items() if isinstance(v, (int, float))]
+            if numeric_keys:
+                first_key = numeric_keys[0]
+                total = sum(float(r.get(first_key) or 0) for r in rows)
+                return f"The '{operation}' analysis returned {len(rows)} records; total {first_key}: {_fmt_money(total)}."
+        return f"The '{operation}' analysis returned {len(rows)} data point(s)."
 
     def _what_drove_it(self, operation: str, rows: list[dict], data: dict) -> str | None:
         if operation == "yoy_growth" and len(rows) >= 2:
@@ -243,16 +327,20 @@ class ExecutiveSummaryAgent:
                 "investigate before drawing conclusions."
             )
         recs = {
-            "yoy_growth": "Monitor the declining segments closely and consider targeted investment to reverse the trend.",
-            "mom_change": "Review seasonal patterns and align inventory and marketing spend accordingly.",
+            "yoy_growth":      "Monitor the declining segments closely and consider targeted investment to reverse the trend.",
+            "mom_change":      "Review seasonal patterns and align inventory and marketing spend accordingly.",
             "compare_periods": "Identify the operational changes between periods to replicate successes or address shortfalls.",
-            "top_n": "Prioritise resources toward the top performers while investigating under-performers for improvement opportunities.",
-            "profit_margins": "Review pricing and cost structure for low-margin segments to improve overall profitability.",
-            "drill_down": "Use this granular view to identify specific sub-segments that need attention.",
-            "roll_up": "Compare the aggregated view against targets to assess strategic alignment.",
-            "revenue_share": "Consider rebalancing the portfolio to reduce over-concentration in a single segment.",
-            "slice": "Apply additional dimension filters to identify the root cause of the observed pattern.",
-            "dice": "Cross-reference with other dimensions to isolate the primary driver of performance.",
-            "pivot": "Use the pivot matrix to spot underperforming intersections and prioritise corrective actions.",
+            "top_n":           "Prioritise resources toward the top performers while investigating under-performers for improvement opportunities.",
+            "profit_margins":  "Review pricing and cost structure for low-margin segments to improve overall profitability.",
+            "drill_down":      "Use this granular view to identify specific sub-segments that need attention.",
+            "roll_up":         "Compare the aggregated view against targets to assess strategic alignment.",
+            "drill_through":   "Cross-reference individual records with operational data to validate aggregated findings.",
+            "revenue_share":   "Consider rebalancing the portfolio to reduce over-concentration in a single segment.",
+            "slice":           "Apply additional dimension filters to identify the root cause of the observed pattern.",
+            "dice":            "Cross-reference with other dimensions to isolate the primary driver of performance.",
+            "pivot":           "Use the pivot matrix to spot underperforming intersections and prioritise corrective actions.",
+            "ytd_revenue":     "Compare YTD performance against annual targets and same period last year to assess trajectory.",
+            "rolling_avg":     "Monitor deviations from the rolling average to detect emerging trends or inflection points early.",
+            "aggregate":       "Drill down into this aggregate to understand the contributing dimensions.",
         }
         return recs.get(operation, "Continue monitoring KPIs and validate findings against operational data.")

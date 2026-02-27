@@ -395,6 +395,12 @@ class SalesRepository:
         """
         return get_db().execute(sql, params or []).df()
 
+    # ── Generic SQL execution helper ─────────────────────────────────────────
+
+    def _execute(self, sql: str, params: list | None = None) -> pd.DataFrame:
+        """Execute arbitrary parameterized SQL and return a DataFrame."""
+        return get_db().execute(sql, params or []).df()
+
     # ── Generic aggregation ───────────────────────────────────────────────────
 
     def get_aggregate_data(

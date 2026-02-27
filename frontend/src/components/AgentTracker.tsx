@@ -26,6 +26,10 @@ const OPERATION_META: Record<string, { label: string; icon: string; color: strin
   top_n: { label: 'Top N', icon: '🏆', color: 'bg-amber-500/15 text-amber-800 border-amber-300' },
   profit_margins: { label: 'Margins', icon: '💰', color: 'bg-lime-500/15 text-lime-800 border-lime-400' },
   revenue_share: { label: 'Revenue Share', icon: '🥧', color: 'bg-pink-500/15 text-pink-800 border-pink-300' },
+  drill_through: { label: 'Drill-through', icon: '🔎', color: 'bg-cyan-500/15 text-cyan-800 border-cyan-300' },
+  ytd_revenue:   { label: 'YTD Revenue', icon: '📅', color: 'bg-green-500/15 text-green-800 border-green-300' },
+  rolling_avg:   { label: 'Rolling Avg', icon: '〰️', color: 'bg-blue-500/15 text-blue-700 border-blue-300' },
+  aggregate:     { label: 'Aggregate', icon: '🔢', color: 'bg-slate-500/15 text-slate-700 border-slate-300' },
 };
 
 function getMeta(key: string, isOperation: boolean) {

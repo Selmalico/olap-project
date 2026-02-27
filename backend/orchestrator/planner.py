@@ -202,30 +202,52 @@ def _rule_based_plan(intent_obj: dict) -> dict:
     intent = intent_obj.get("intent", "top_n")
 
     intent_to_primary: dict[str, list[str]] = {
-        "drill_down":      ["dimension_navigator"],
-        "roll_up":         ["dimension_navigator"],
+        "drill_down":         ["dimension_navigator"],
+        "roll_up":            ["dimension_navigator"],
+        "drill_through":      ["dimension_navigator"],
         "describe_hierarchy": ["dimension_navigator"],
-        "slice":           ["cube_operations"],
-        "dice":            ["cube_operations"],
-        "pivot":           ["cube_operations"],
-        "compare_periods": ["kpi_calculator", "anomaly_detection"],
-        "yoy_growth":      ["kpi_calculator", "anomaly_detection"],
-        "mom_change":      ["kpi_calculator"],
-        "top_n":           ["kpi_calculator"],
-        "profit_margins":  ["kpi_calculator"],
-        "revenue_share":   ["kpi_calculator"],
-        "aggregate":       ["kpi_calculator"],
+        "slice":              ["cube_operations"],
+        "dice":               ["cube_operations"],
+        "pivot":              ["cube_operations"],
+        "compare_periods":    ["kpi_calculator", "anomaly_detection"],
+        "yoy_growth":         ["kpi_calculator", "anomaly_detection"],
+        "mom_change":         ["kpi_calculator"],
+        "ytd_revenue":        ["kpi_calculator"],
+        "rolling_avg":        ["kpi_calculator"],
+        "top_n":              ["kpi_calculator"],
+        "profit_margins":     ["kpi_calculator"],
+        "revenue_share":      ["kpi_calculator"],
+        "aggregate":          ["kpi_calculator"],
     }
     primary = intent_to_primary.get(intent, ["kpi_calculator"])
     agents = primary + ["report_generator", "visualization_agent", "executive_summary"]
+
+    follow_up_map: dict[str, list[str]] = {
+        "drill_down":      ["Roll up to see the bigger picture", "Show profit margins at this level", "Which sub-group has the highest revenue?"],
+        "roll_up":         ["Drill down for more detail", "Compare year-over-year at this level", "Show revenue share by region"],
+        "drill_through":   ["Summarise these transactions by category", "Show top 5 countries by revenue", "Drill down to quarterly level"],
+        "compare_periods": ["Show YoY growth by category", "Which region drove the biggest change?", "Drill down into the best-performing quarter"],
+        "yoy_growth":      ["Show month-over-month trend for 2024", "Which category has the highest YoY growth?", "Compare Q3 vs Q4 this year"],
+        "mom_change":      ["Show YoY growth for the same metric", "Which region had the biggest monthly swing?", "Show YTD cumulative revenue for 2024"],
+        "ytd_revenue":     ["Compare YTD vs same period last year", "Show month-over-month within this year", "Which category drives the most YTD revenue?"],
+        "rolling_avg":     ["Show raw monthly data alongside the rolling average", "Compare 3-month vs 6-month rolling averages", "Which month had the biggest deviation from the trend?"],
+        "top_n":           ["Show profit margins for these top performers", "Compare these results with last year", "Drill into the top country by region"],
+        "profit_margins":  ["Which subcategory has the lowest margin?", "Show revenue vs profit for these groups", "Compare margins YoY"],
+        "revenue_share":   ["Show top 5 by absolute revenue", "Compare revenue share between 2023 and 2024", "Drill down to country level"],
+        "slice":           ["Add another filter to narrow down", "Show YoY growth for this slice", "Which sub-group performs best here?"],
+        "dice":            ["Show profit margins for this combination", "Drill down within this filtered view", "Compare with a different time period"],
+        "pivot":           ["Show the same pivot for profit", "Which cell in the matrix has the highest value?", "Compare this pivot with last year"],
+        "aggregate":       ["Break this down by category", "Show YoY growth", "Which region contributes the most?"],
+    }
+    follow_ups = follow_up_map.get(intent, [
+        "Show revenue breakdown by region",
+        "Compare 2023 vs 2024 performance",
+        "Which segment has the highest profit margin?",
+    ])
 
     return {
         "intent": intent,
         "agents": agents,
         "parameters": intent_obj.get("params", {}),
-        "follow_up_questions": [
-            f"Show me the breakdown by region for this data",
-            f"Compare this with the previous period",
-            f"Which segment has the highest profit margin?",
-        ],
+        "follow_up_questions": follow_ups,
     }
